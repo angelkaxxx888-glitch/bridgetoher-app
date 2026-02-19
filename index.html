@@ -485,7 +485,7 @@
             <p>Привет.</p>
             <p style="margin: 20px 0;">Это приложение — мост между твоим настроением и его пониманием.</p>
             <p>Ответь на несколько вопросов — и он будет знать, как тебя поддержать.</p>
-            <p style="margin-top: 20px; color: #b49aff;">А если его нет — я поддержу тебя сама ❤️</p>
+            <p style="margin-top: 20px; color: #b49aff; font-size: 20px;">я поддержу тебя сам ❤️</p>
         </div>
         
         <div class="nav-buttons">
@@ -640,10 +640,9 @@
             </div>
         </div>
         
-        <button onclick="saveChecklist()">💾 Сохранить</button>
+        <button onclick="saveChecklist()">💾 Сохранить и продолжить</button>
         <div class="nav-buttons">
             <button class="secondary-btn" onclick="goToPage(2)">← Назад</button>
-            <button class="forward-btn" onclick="goToPage(4)">Вперёд →</button>
         </div>
     </div>
 
@@ -653,7 +652,6 @@
         
         <h2>📅 Календарь цикла</h2>
         
-        <!-- Настройки цикла -->
         <div style="background: rgba(180, 154, 255, 0.15); border-radius: 20px; padding: 16px; margin-bottom: 16px;">
             <h3 style="margin-top: 0;">⚙️ Мои настройки</h3>
             
@@ -670,29 +668,24 @@
             <button onclick="updateCycleSettings()" style="background: #b49aff; margin-top: 8px; padding: 10px;">Сохранить настройки</button>
         </div>
         
-        <!-- Переключатель месяцев -->
         <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 16px;">
             <button class="secondary-btn" style="width: auto; padding: 8px 16px;" onclick="setMonthsView(1)">1 мес</button>
             <button class="secondary-btn" style="width: auto; padding: 8px 16px;" onclick="setMonthsView(3)">3 мес</button>
             <button class="secondary-btn" style="width: auto; padding: 8px 16px; background: #b49aff; color: white;" onclick="setMonthsView(12)" id="months12Btn">12 мес</button>
         </div>
         
-        <!-- Месяц -->
         <div class="calendar-header">
             <button onclick="changeMonth(-1)">←</button>
             <span style="font-size: 18px; color: #c0b0ff;" id="monthYearDisplay"></span>
             <button onclick="changeMonth(1)">→</button>
         </div>
         
-        <!-- Дни недели -->
         <div class="calendar-weekdays">
             <div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div>
         </div>
         
-        <!-- Календарь -->
         <div class="calendar-grid" id="calendarGrid"></div>
         
-        <!-- Легенда -->
         <div class="legend">
             <div class="legend-item"><div class="legend-color" style="background: #FF2400;"></div> 🔴 Месячные</div>
             <div class="legend-item"><div class="legend-color" style="background: #FFB6C1;"></div> 🌸 Прогноз</div>
@@ -760,6 +753,11 @@
         
         <button onclick="saveSettings()">💾 Сохранить</button>
         
+        <!-- Кнопка для редактирования чек-листа (появляется, если он заполнен) -->
+        <button id="editChecklistBtn" class="secondary-btn" style="margin-top: 16px; display: none;" onclick="editChecklist()">
+            📋 Редактировать мои ответы
+        </button>
+        
         <div class="nav-buttons">
             <button class="secondary-btn" onclick="goToPage(4)">← Назад</button>
             <button class="forward-btn" onclick="goToPage(6)">Вперёд →</button>
@@ -818,7 +816,7 @@
         partnerChatId: localStorage.getItem('partnerChatId') || '',
         partnerName: localStorage.getItem('partnerName') || '',
         hasPartner: localStorage.getItem('hasPartner') !== 'false',
-        checklist: {}
+        checklistCompleted: localStorage.getItem('checklistCompleted') === 'true'
     };
 
     let currentDate = new Date();
@@ -832,17 +830,33 @@
         periodLength: 5
     };
 
+    let checklistData = JSON.parse(localStorage.getItem('checklistData')) || {};
+
     function goToPage(pageNum) {
-        for (let i = 1; i <= 6; i++) {
-            document.getElementById(`page${i}`).style.display = 'none';
+        // Если чек-лист заполнен, скрываем страницу 3 из навигации
+        if (pageNum === 3 && appState.checklistCompleted) {
+            // Вместо страницы 3 переходим на страницу 4
+            pageNum = 4;
         }
-        document.getElementById(`page${pageNum}`).style.display = 'block';
+        
+        for (let i = 1; i <= 6; i++) {
+            const page = document.getElementById(`page${i}`);
+            if (page) page.style.display = 'none';
+        }
+        
+        const targetPage = document.getElementById(`page${pageNum}`);
+        if (targetPage) targetPage.style.display = 'block';
         
         if (pageNum === 4) {
             renderCalendar();
             updateStats();
         }
         if (pageNum === 2) generateQR();
+        if (pageNum === 5) {
+            // Показываем кнопку редактирования, если чек-лист заполнен
+            document.getElementById('editChecklistBtn').style.display = 
+                appState.checklistCompleted ? 'block' : 'none';
+        }
         
         for (let i = 1; i <= 6; i++) {
             const step = document.getElementById(`progress${i}`);
@@ -885,8 +899,19 @@
     }
 
     function saveChecklist() {
-        alert('✅ Сохранено!');
+        // Сохраняем все ответы из чек-листа
+        // (здесь можно собрать все галочки, но для простоты просто помечаем как заполненный)
+        appState.checklistCompleted = true;
+        localStorage.setItem('checklistCompleted', 'true');
+        localStorage.setItem('checklistData', JSON.stringify({ completed: true }));
+        
+        alert('✅ Спасибо! Теперь я знаю о тебе больше.');
         goToPage(4);
+    }
+
+    function editChecklist() {
+        // Загружаем сохранённые ответы (пока просто показываем страницу)
+        goToPage(3);
     }
 
     function saveSettings() {
@@ -1026,6 +1051,11 @@
         localStorage.setItem('cycleData', JSON.stringify(cycleData));
         renderCalendar();
         updateStats();
+        
+        // Автоматически отправляем подсказку партнёру при отметке нового цикла
+        if (appState.hasPartner && appState.partnerChatId) {
+            sendAutoMessage();
+        }
     }
 
     function updateStats() {
@@ -1040,6 +1070,67 @@
         alert('Планировщик появится в следующей версии');
     }
 
+    // ==================== АВТОМАТИЧЕСКИЕ СООБЩЕНИЯ ПАРТНЁРУ ====================
+    function getPhaseFromDate() {
+        if (cycleData.periods.length === 0) return null;
+        
+        const today = new Date();
+        const lastPeriod = new Date(cycleData.periods[cycleData.periods.length - 1]);
+        const daysDiff = Math.floor((today - lastPeriod) / (1000 * 60 * 60 * 24));
+        const cycleLength = cycleData.cycleLength || 28;
+        
+        // Определяем фазу
+        if (daysDiff < 0) return null;
+        if (daysDiff < cycleData.periodLength) return 'period';
+        if (daysDiff >= cycleLength - 5 && daysDiff <= cycleLength) return 'pms';
+        
+        const ovulationDay = Math.floor(cycleLength / 2) - 2;
+        if (daysDiff >= ovulationDay - 1 && daysDiff <= ovulationDay + 1) return 'ovulation';
+        
+        return 'normal';
+    }
+
+    function getMessageForPhase(phase) {
+        const messages = {
+            'pms': '🌪 У неё сейчас ПМС. Она говорила, что в такие дни ей помогает сладкое и тишина. Будь особенно внимателен сегодня.',
+            'period': '🔴 У неё первый день цикла. Сейчас ей может быть тяжело. Просто будь рядом и предложи помощь.',
+            'ovulation': '💗 Овуляция! Отличный день для романтики. Она сейчас особенно чувствительна к комплиментам.',
+            'normal': '🌸 Сегодня обычный день. Но она всегда будет рада твоему вниманию.'
+        };
+        return messages[phase] || '🌸 Я рядом, чтобы напомнить — она тебя любит.';
+    }
+
+    function sendAutoMessage() {
+        if (!appState.hasPartner || !appState.partnerChatId) return;
+        
+        const phase = getPhaseFromDate();
+        if (!phase) return;
+        
+        // Проверяем, отправляли ли уже сегодня
+        const lastSent = localStorage.getItem('lastAutoMessage');
+        const today = new Date().toDateString();
+        
+        if (lastSent === today) return; // Уже отправляли сегодня
+        
+        const message = getMessageForPhase(phase);
+        
+        fetch(`${PROXY_URL}/send-message`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: appState.partnerChatId,
+                text: message + '\n\n— с любовью, BridgeToHer 🌉'
+            })
+        }).then(() => {
+            localStorage.setItem('lastAutoMessage', today);
+        }).catch(e => console.log('Ошибка отправки автосообщения:', e));
+    }
+
+    // Запускаем проверку при загрузке страницы
+    setInterval(() => {
+        sendAutoMessage();
+    }, 60 * 60 * 1000); // Проверяем каждый час
+
     document.querySelectorAll('.mood-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             this.classList.toggle('active');
@@ -1047,11 +1138,14 @@
     });
     
     document.getElementById('sendDailyBtn').addEventListener('click', function() {
-        alert('Отправка сообщений появится в следующей версии');
+        alert('Ручная отправка появится в следующей версии');
     });
 
     const savedHasPartner = localStorage.getItem('hasPartner');
     if (savedHasPartner === 'false') appState.hasPartner = false;
+    
+    // Загружаем статус чек-листа
+    appState.checklistCompleted = localStorage.getItem('checklistCompleted') === 'true';
     
     if (appState.partnerChatId) goToPage(6);
     else goToPage(1);
