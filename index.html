@@ -650,81 +650,247 @@
     </div>
 
     <!-- СТРАНИЦА 4: Календарь и прогноз на 12 месяцев -->
-    <div id="page4" style="display: none;">
-        <button class="back-btn" onclick="goToPage(3)">← Назад</button>
+   // ==================== КАЛЕНДАРЬ И ПРОГНОЗ ====================
+let currentDate = new Date();
+let currentMonth = currentDate.getMonth();
+let currentYear = currentDate.getFullYear();
+let monthsView = 1; // по умолчанию показываем 1 месяц
+
+// Загружаем данные календаря
+let cycleData = JSON.parse(localStorage.getItem('cycleData')) || { 
+    periods: [],
+    cycleLength: 28,
+    periodLength: 5
+};
+
+function setMonthsView(months) {
+    monthsView = months;
+    // Подсвечиваем активную кнопку
+    document.querySelectorAll('[onclick^="setMonthsView"]').forEach(btn => {
+        btn.style.background = 'transparent';
+        btn.style.color = '#b49aff';
+    });
+    if (months === 1) {
+        document.querySelector('[onclick="setMonthsView(1)"]').style.background = '#b49aff';
+        document.querySelector('[onclick="setMonthsView(1)"]').style.color = 'white';
+    } else if (months === 3) {
+        document.querySelector('[onclick="setMonthsView(3)"]').style.background = '#b49aff';
+        document.querySelector('[onclick="setMonthsView(3)"]').style.color = 'white';
+    } else if (months === 12) {
+        document.getElementById('months12Btn').style.background = '#b49aff';
+        document.getElementById('months12Btn').style.color = 'white';
+    }
+    renderCalendar();
+}
+
+function updateCycleSettings() {
+    cycleData.cycleLength = parseInt(document.getElementById('cycleLength').value) || 28;
+    cycleData.periodLength = parseInt(document.getElementById('periodLength').value) || 5;
+    localStorage.setItem('cycleData', JSON.stringify(cycleData));
+    renderCalendar();
+    alert('✅ Настройки цикла сохранены!');
+}
+
+function renderCalendar() {
+    const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+    
+    // Показываем текущий месяц
+    document.getElementById('monthYearDisplay').innerText = monthNames[currentMonth] + ' ' + currentYear;
+    
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    
+    let startOffset = firstDay === 0 ? 6 : firstDay - 1;
+    
+    let gridHtml = '';
+    
+    // Пустые ячейки для выравнивания
+    for (let i = 0; i < startOffset; i++) {
+        gridHtml += `<div class="calendar-day" style="background: transparent;"></div>`;
+    }
+    
+    // Получаем настройки
+    const cycleLength = cycleData.cycleLength || 28;
+    const periodLength = cycleData.periodLength || 5;
+    
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        const isPeriod = cycleData.periods.includes(dateStr);
         
-        <h2>📅 Календарь цикла</h2>
+        // Прогноз
+        let isPredictedPeriod = false;
+        let isPredictedOvulation = false;
+        let isPMS = false;
         
-        <!-- Настройка длины цикла -->
-        <div style="background: rgba(180, 154, 255, 0.15); border-radius: 20px; padding: 16px; margin-bottom: 16px;">
-            <h3 style="margin-top: 0;">📊 Настройка цикла</h3>
-            <div style="display: flex; gap: 10px; align-items: center;">
-                <span style="color: #c0b0ff; flex: 1;">Средняя длина цикла:</span>
-                <input type="number" id="manualCycleLength" min="20" max="40" value="28" style="width: 80px; text-align: center;">
-                <span style="color: #9a8db3;">дней</span>
+        if (cycleData.periods.length > 0) {
+            const lastPeriod = new Date(cycleData.periods[cycleData.periods.length - 1]);
+            
+            // Рассчитываем прогноз на несколько циклов вперёд
+            for (let cycle = 0; cycle < 6; cycle++) {
+                // Дата начала предполагаемой менструации
+                const predictedStart = new Date(lastPeriod);
+                predictedStart.setDate(lastPeriod.getDate() + (cycleLength * cycle));
+                
+                // Проверяем каждый день менструации (по длительности)
+                for (let d = 0; d < periodLength; d++) {
+                    const periodDay = new Date(predictedStart);
+                    periodDay.setDate(predictedStart.getDate() + d);
+                    const periodDayStr = periodDay.toISOString().split('T')[0];
+                    
+                    if (dateStr === periodDayStr) {
+                        isPredictedPeriod = true;
+                    }
+                }
+                
+                // Овуляция за 14 дней до следующей менструации
+                const ovulationDate = new Date(predictedStart);
+                ovulationDate.setDate(predictedStart.getDate() - 14);
+                if (dateStr === ovulationDate.toISOString().split('T')[0]) {
+                    isPredictedOvulation = true;
+                }
+                
+                // ПМС за 3-5 дней до менструации
+                for (let p = 1; p <= 5; p++) {
+                    const pmsDay = new Date(predictedStart);
+                    pmsDay.setDate(predictedStart.getDate() - p);
+                    if (dateStr === pmsDay.toISOString().split('T')[0]) {
+                        isPMS = true;
+                    }
+                }
+            }
+        }
+        
+        // Определяем цвет и иконку
+        let bgColor = 'rgba(180, 154, 255, 0.1)';
+        let icon = '';
+        
+        if (isPeriod) {
+            bgColor = '#FF2400'; // алый для менструации
+            icon = '🔴';
+        } else if (isPredictedPeriod) {
+            bgColor = '#FFB6C1'; // розовый для прогноза
+            icon = '🌙';
+        } else if (isPredictedOvulation) {
+            bgColor = '#E6E6FA'; // лавандовый для овуляции
+            icon = '💗';
+        } else if (isPMS) {
+            bgColor = '#87CEEB'; // небесно-голубой для ПМС
+            icon = '🌪';
+        }
+        
+        const today = new Date().toISOString().split('T')[0];
+        if (dateStr === today) {
+            bgColor = '#FFFFE0'; // бледно-желтый для сегодня
+            icon = '✨';
+        }
+        
+        gridHtml += `
+            <div class="calendar-day" style="background: ${bgColor};" onclick="togglePeriod('${dateStr}')">
+                <span>${day}</span>
+                ${icon ? `<span class="day-icon">${icon}</span>` : ''}
             </div>
-            <div style="margin-top: 8px; font-size: 12px; color: #9a8db3;" id="cycleHint">
-                Можно указать вручную или через 3 цикла рассчитаем автоматически
-            </div>
-        </div>
+        `;
+    }
+    
+    document.getElementById('calendarGrid').innerHTML = gridHtml;
+    
+    // Обновляем поля ввода текущими значениями
+    document.getElementById('cycleLength').value = cycleData.cycleLength || 28;
+    document.getElementById('periodLength').value = cycleData.periodLength || 5;
+}
+
+function changeMonth(delta) {
+    currentMonth += delta;
+    if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+    } else if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+    }
+    renderCalendar();
+}
+
+function togglePeriod(dateStr) {
+    const index = cycleData.periods.indexOf(dateStr);
+    if (index === -1) {
+        cycleData.periods.push(dateStr);
+        cycleData.periods.sort();
+    } else {
+        cycleData.periods.splice(index, 1);
+    }
+    renderCalendar();
+    updateStats();
+}
+
+function saveCycle() {
+    localStorage.setItem('cycleData', JSON.stringify(cycleData));
+    alert('✅ Отмеченные дни сохранены!');
+}
+
+function updateStats() {
+    const cyclesCount = cycleData.periods.length;
+    document.getElementById('cyclesCount').innerText = cyclesCount;
+    
+    if (cycleData.periods.length > 0) {
+        const last = new Date(cycleData.periods[cycleData.periods.length - 1]);
+        document.getElementById('lastPeriod').innerText = last.toLocaleDateString('ru-RU');
+    } else {
+        document.getElementById('lastPeriod').innerText = '—';
+    }
+}
+
+function checkPlanner() {
+    const start = document.getElementById('plannerStart').value;
+    const end = document.getElementById('plannerEnd').value;
+    
+    if (!start || !end) {
+        alert('Выбери начальную и конечную даты');
+        return;
+    }
+    
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    
+    let hasPeriod = false;
+    let hasOvulation = false;
+    let days = [];
+    
+    const cycleLength = cycleData.cycleLength || 28;
+    
+    // Проверяем каждый день диапазона
+    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+        const dateStr = d.toISOString().split('T')[0];
         
-        <!-- Переключатель количества месяцев -->
-        <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 16px;">
-            <button class="secondary-btn" style="width: auto; padding: 8px 16px;" onclick="setMonthsView(1)">1 мес</button>
-            <button class="secondary-btn" style="width: auto; padding: 8px 16px;" onclick="setMonthsView(3)">3 мес</button>
-            <button class="secondary-btn" style="width: auto; padding: 8px 16px; background: #b49aff; color: white;" onclick="setMonthsView(12)" id="months12Btn">12 мес</button>
-        </div>
+        if (cycleData.periods.includes(dateStr)) {
+            hasPeriod = true;
+            days.push(dateStr);
+        }
         
-        <!-- Навигация по месяцам -->
-        <div class="calendar-header">
-            <button onclick="changeMonth(-1)">←</button>
-            <span style="font-size: 18px; color: #c0b0ff;" id="monthYearDisplay"></span>
-            <button onclick="changeMonth(1)">→</button>
-        </div>
-        
-        <!-- Дни недели -->
-        <div class="calendar-weekdays">
-            <div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div>
-        </div>
-        
-        <!-- Сетка календаря -->
-        <div class="calendar-grid" id="calendarGrid"></div>
-        
-        <!-- Легенда -->
-        <div class="legend">
-            <div class="legend-item"><div class="legend-color" style="background: #87CEEB;"></div> ПМС 🌪</div>
-            <div class="legend-item"><div class="legend-color" style="background: #FFB6C1;"></div> Менструация</div>
-            <div class="legend-item"><div class="legend-color" style="background: #FFC0CB;"></div> Прогноз</div>
-            <div class="legend-item"><div class="legend-color" style="background: #E6E6FA;"></div> Овуляция 💗</div>
-            <div class="legend-item"><div class="legend-color" style="background: #FFFFE0;"></div> Сегодня ✨</div>
-        </div>
-        
-        <!-- Статистика -->
-        <div class="stats-card">
-            <h3 style="margin-top: 0;">📊 Статистика</h3>
-            <div class="stats-row"><span>Отмечено циклов:</span> <span id="cyclesCount">0</span></div>
-            <div class="stats-row"><span>Последняя менструация:</span> <span id="lastPeriod">—</span></div>
-        </div>
-        
-        <!-- Планировщик -->
-        <div class="planner-card">
-            <h3 style="margin-top: 0;">🗓 Планировщик</h3>
-            <div style="display: flex; gap: 8px;">
-                <input type="date" id="plannerStart" style="flex: 1;">
-                <input type="date" id="plannerEnd" style="flex: 1;">
-            </div>
-            <button onclick="checkPlanner()" class="secondary-btn" style="margin-top: 8px;">Проверить</button>
-            <div id="plannerResult" class="planner-result" style="display: none;"></div>
-        </div>
-        
-        <!-- Кнопка сохранения -->
-        <button onclick="saveCycle()" style="background: #4CAF50; margin-top: 16px;">💾 Сохранить календарь</button>
-        
-        <div class="nav-buttons" style="margin-top: 16px;">
-            <button class="secondary-btn" onclick="goToPage(3)">← Назад</button>
-            <button class="forward-btn" onclick="goToPage(5)">Вперёд →</button>
-        </div>
-    </div>
+        // Проверка прогноза
+        if (cycleData.periods.length > 0) {
+            const lastPeriod = new Date(cycleData.periods[cycleData.periods.length - 1]);
+            for (let cycle = 0; cycle < 6; cycle++) {
+                const ovulationDate = new Date(lastPeriod);
+                ovulationDate.setDate(lastPeriod.getDate() + (cycleLength * cycle) - 14);
+                if (dateStr === ovulationDate.toISOString().split('T')[0]) {
+                    hasOvulation = true;
+                }
+            }
+        }
+    }
+    
+    const resultDiv = document.getElementById('plannerResult');
+    resultDiv.style.display = 'block';
+    
+    if (hasPeriod) {
+        resultDiv.innerHTML = '⚠️ В выбранный период есть дни менструации. Возможно, стоит выбрать другие даты.';
+    } else if (hasOvulation) {
+        resultDiv.innerHTML = '🌸 В выбранный период есть овуляция. Отличное время для романтики!';
+    } else {
+        resultDiv.innerHTML = '✅ В выбранный период нет менструации. Можно планировать!';
+    }
+}
 
     <!-- СТРАНИЦА 5: Настройки -->
     <div id="page5" style="display: none;">
@@ -1424,3 +1590,4 @@
 </script>
 </body>
 </html>
+
