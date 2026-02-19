@@ -460,6 +460,19 @@
         .technique-btn:hover {
             background: rgba(180, 154, 255, 0.2);
         }
+        
+        .notification-permission {
+            background: rgba(255, 255, 100, 0.15);
+            border-left: 4px solid #ffaa00;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 0 12px 12px 0;
+            display: none;
+        }
+        .notification-permission button {
+            background: #ffaa00;
+            margin-top: 8px;
+        }
     </style>
 </head>
 <body>
@@ -751,9 +764,16 @@
             </div>
         </div>
         
+        <div class="settings-group">
+            <h3>📱 Push-уведомления</h3>
+            <div class="settings-item">
+                <span class="settings-label">Разрешить уведомления</span>
+                <button onclick="requestNotificationPermission()" class="secondary-btn" style="margin: 0; padding: 8px;">Включить</button>
+            </div>
+        </div>
+        
         <button onclick="saveSettings()">💾 Сохранить</button>
         
-        <!-- Кнопка для редактирования чек-листа (появляется, если он заполнен) -->
         <button id="editChecklistBtn" class="secondary-btn" style="margin-top: 16px; display: none;" onclick="editChecklist()">
             📋 Редактировать мои ответы
         </button>
@@ -832,10 +852,101 @@
 
     let checklistData = JSON.parse(localStorage.getItem('checklistData')) || {};
 
+    // ==================== PUSH-УВЕДОМЛЕНИЯ ====================
+    function requestNotificationPermission() {
+        if (!("Notification" in window)) {
+            alert("Извините, ваш браузер не поддерживает push-уведомления.");
+            return;
+        }
+        
+        if (Notification.permission === "granted") {
+            alert("Уведомления уже включены! ✅");
+            showTestNotification();
+        } else if (Notification.permission !== "denied") {
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    alert("Уведомления включены! Теперь я буду напоминать тебе о важных днях ❤️");
+                    scheduleDailyNotification();
+                }
+            });
+        }
+    }
+
+    function showTestNotification() {
+        new Notification("BridgeToHer 🌉", {
+            body: "Уведомления работают! Теперь я буду рядом ❤️",
+            icon: "https://bridgetoher-app.onrender.com/favicon.ico"
+        });
+    }
+
+    function sendPushNotification(title, message) {
+        if (Notification.permission === "granted") {
+            new Notification(title, {
+                body: message,
+                icon: "https://bridgetoher-app.onrender.com/favicon.ico"
+            });
+        }
+    }
+
+    function scheduleDailyNotification() {
+        const now = new Date();
+        const reminderTime = document.getElementById('reminderTime')?.value || "20:00";
+        const [hours, minutes] = reminderTime.split(':');
+        
+        const scheduled = new Date();
+        scheduled.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+        
+        if (scheduled < now) {
+            scheduled.setDate(scheduled.getDate() + 1);
+        }
+        
+        const timeUntilReminder = scheduled - now;
+        
+        setTimeout(() => {
+            sendPushNotification(
+                "BridgeToHer 🌸",
+                "Как ты себя чувствуешь сегодня? Отметь настроение, чтобы я знал, как поддержать тебя ❤️"
+            );
+            scheduleDailyNotification(); // перезапускаем на следующий день
+        }, timeUntilReminder);
+    }
+
+    function checkPhaseAndNotify() {
+        if (cycleData.periods.length === 0) return;
+        
+        const phase = getPhaseFromDate();
+        const today = new Date().toDateString();
+        const lastPhaseNotify = localStorage.getItem('lastPhaseNotify');
+        
+        if (lastPhaseNotify === today) return; // уже уведомляли сегодня
+        
+        let message = '';
+        switch(phase) {
+            case 'pms':
+                message = '🌪 Сегодня у тебя может быть ПМС. Будь добрее к себе, ты справляешься ❤️';
+                break;
+            case 'period':
+                message = '🔴 Сегодня первый день цикла. Позволь себе отдохнуть. Я рядом ✨';
+                break;
+            case 'ovulation':
+                message = '💗 Овуляция! Сегодня твоя энергия на пике. Отличный день для романтики 💫';
+                break;
+        }
+        
+        if (message) {
+            sendPushNotification('BridgeToHer', message);
+            localStorage.setItem('lastPhaseNotify', today);
+        }
+    }
+
+    // Запускаем проверку каждый час
+    setInterval(() => {
+        checkPhaseAndNotify();
+    }, 60 * 60 * 1000);
+
+    // ==================== НАВИГАЦИЯ ====================
     function goToPage(pageNum) {
-        // Если чек-лист заполнен, скрываем страницу 3 из навигации
         if (pageNum === 3 && appState.checklistCompleted) {
-            // Вместо страницы 3 переходим на страницу 4
             pageNum = 4;
         }
         
@@ -853,7 +964,6 @@
         }
         if (pageNum === 2) generateQR();
         if (pageNum === 5) {
-            // Показываем кнопку редактирования, если чек-лист заполнен
             document.getElementById('editChecklistBtn').style.display = 
                 appState.checklistCompleted ? 'block' : 'none';
         }
@@ -867,6 +977,7 @@
         }
     }
 
+    // ==================== ПРИГЛАШЕНИЕ ПАРТНЁРА ====================
     function generateQR() {
         document.getElementById('qrContainer').innerHTML = 
             `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(BOT_LINK)}" alt="QR-код">`;
@@ -891,6 +1002,70 @@
         goToPage(3);
     }
     
+    async function checkPartner() {
+        const statusDiv = document.getElementById('partnerStatus');
+        statusDiv.innerHTML = '🔍 Проверяем...';
+        
+        try {
+            const response = await fetch(`${PROXY_URL}/get-updates`);
+            const data = await response.json();
+            
+            if (data.ok && data.result && data.result.length > 0) {
+                const updates = data.result.reverse();
+                let foundPartner = null;
+                
+                for (const update of updates) {
+                    if (update.message && update.message.text && update.message.text.includes('/start')) {
+                        foundPartner = {
+                            chatId: update.message.chat.id.toString(),
+                            name: (update.message.from.first_name || '') + ' ' + (update.message.from.last_name || '')
+                        };
+                        break;
+                    }
+                }
+                
+                if (foundPartner) {
+                    appState.partnerChatId = foundPartner.chatId;
+                    appState.partnerName = foundPartner.name.trim() || 'партнёр';
+                    appState.hasPartner = true;
+                    
+                    localStorage.setItem('partnerChatId', appState.partnerChatId);
+                    localStorage.setItem('partnerName', appState.partnerName);
+                    localStorage.setItem('hasPartner', 'true');
+                    
+                    statusDiv.innerHTML = `
+                        <div style="background: rgba(76, 175, 80, 0.2); padding: 16px; border-radius: 16px;">
+                            ✅ Подключён: ${appState.partnerName}
+                        </div>
+                    `;
+                    
+                    const welcomeSent = localStorage.getItem('welcomeSent_' + foundPartner.chatId);
+                    
+                    if (!welcomeSent) {
+                        const partnerFirstName = appState.partnerName.split(' ')[0];
+                        await fetch(`${PROXY_URL}/send-message`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                chat_id: foundPartner.chatId,
+                                text: `🎉 *Привет, ${partnerFirstName}!*\n\nТы подключён к BridgeToHer. Теперь твоя партнёрша может отправлять тебе уведомления о своём настроении.\n\nЯ буду присылать тебе подсказки, чтобы вы были ещё ближе ❤️`
+                            })
+                        });
+                        localStorage.setItem('welcomeSent_' + foundPartner.chatId, 'true');
+                    }
+                    
+                    setTimeout(() => goToPage(3), 1500);
+                } else {
+                    statusDiv.innerHTML = '❌ Партнёр ещё не нажал /start. Попроси его открыть бота и нажать "Start".';
+                }
+            } else {
+                statusDiv.innerHTML = '❌ Ошибка подключения. Попробуй позже.';
+            }
+        } catch (error) {
+            statusDiv.innerHTML = '❌ Ошибка: ' + error.message;
+        }
+    }
+
     function showPhase(phaseId) {
         document.querySelectorAll('.phase-tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.phase-content').forEach(c => c.classList.remove('active'));
@@ -899,8 +1074,6 @@
     }
 
     function saveChecklist() {
-        // Сохраняем все ответы из чек-листа
-        // (здесь можно собрать все галочки, но для простоты просто помечаем как заполненный)
         appState.checklistCompleted = true;
         localStorage.setItem('checklistCompleted', 'true');
         localStorage.setItem('checklistData', JSON.stringify({ completed: true }));
@@ -910,7 +1083,6 @@
     }
 
     function editChecklist() {
-        // Загружаем сохранённые ответы (пока просто показываем страницу)
         goToPage(3);
     }
 
@@ -1052,7 +1224,6 @@
         renderCalendar();
         updateStats();
         
-        // Автоматически отправляем подсказку партнёру при отметке нового цикла
         if (appState.hasPartner && appState.partnerChatId) {
             sendAutoMessage();
         }
@@ -1079,7 +1250,6 @@
         const daysDiff = Math.floor((today - lastPeriod) / (1000 * 60 * 60 * 24));
         const cycleLength = cycleData.cycleLength || 28;
         
-        // Определяем фазу
         if (daysDiff < 0) return null;
         if (daysDiff < cycleData.periodLength) return 'period';
         if (daysDiff >= cycleLength - 5 && daysDiff <= cycleLength) return 'pms';
@@ -1091,13 +1261,15 @@
     }
 
     function getMessageForPhase(phase) {
+        const partnerName = appState.partnerName.split(' ')[0] || 'милый';
+        
         const messages = {
-            'pms': '🌪 У неё сейчас ПМС. Она говорила, что в такие дни ей помогает сладкое и тишина. Будь особенно внимателен сегодня.',
-            'period': '🔴 У неё первый день цикла. Сейчас ей может быть тяжело. Просто будь рядом и предложи помощь.',
-            'ovulation': '💗 Овуляция! Отличный день для романтики. Она сейчас особенно чувствительна к комплиментам.',
-            'normal': '🌸 Сегодня обычный день. Но она всегда будет рада твоему вниманию.'
+            'pms': `🌪 *Привет, ${partnerName}*\n\nУ неё сейчас ПМС. В такие дни ей может быть тяжело, она говорила, что в это время ей помогает сладкое и тишина.\n\nБудь особенно внимателен сегодня ❤️`,
+            'period': `🔴 *Привет, ${partnerName}*\n\nУ неё первый день цикла. Сейчас ей может быть больно и тяжело. Просто будь рядом и предложи помощь. Иногда молчаливое присутствие важнее любых слов ✨`,
+            'ovulation': `💗 *Привет, ${partnerName}*\n\nОвуляция! Сегодня она особенно чувствительна к комплиментам. Самое время для романтики и тёплых слов 🌸`,
+            'normal': `🌸 *Привет, ${partnerName}*\n\nСегодня обычный день, но она всегда будет рада твоему вниманию. Просто напомни ей, что ты рядом ❤️`
         };
-        return messages[phase] || '🌸 Я рядом, чтобы напомнить — она тебя любит.';
+        return messages[phase] || `🌸 *Привет, ${partnerName}*\n\nЯ просто напоминаю — она тебя любит. Будь рядом ❤️`;
     }
 
     function sendAutoMessage() {
@@ -1106,11 +1278,10 @@
         const phase = getPhaseFromDate();
         if (!phase) return;
         
-        // Проверяем, отправляли ли уже сегодня
         const lastSent = localStorage.getItem('lastAutoMessage');
         const today = new Date().toDateString();
         
-        if (lastSent === today) return; // Уже отправляли сегодня
+        if (lastSent === today) return;
         
         const message = getMessageForPhase(phase);
         
@@ -1119,17 +1290,29 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 chat_id: appState.partnerChatId,
-                text: message + '\n\n— с любовью, BridgeToHer 🌉'
+                text: message + '\n\n— с любовью, BridgeToHer 🌉',
+                parse_mode: 'Markdown'
             })
         }).then(() => {
             localStorage.setItem('lastAutoMessage', today);
         }).catch(e => console.log('Ошибка отправки автосообщения:', e));
     }
 
-    // Запускаем проверку при загрузке страницы
-    setInterval(() => {
-        sendAutoMessage();
-    }, 60 * 60 * 1000); // Проверяем каждый час
+    // ==================== ТЕХНИКИ ПОДДЕРЖКИ ====================
+    function showBreathing() {
+        alert('🌬 *Дыхательное упражнение*\n\n1. Вдох на 4 счёта\n2. Задержка дыхания на 4 счёта\n3. Выдох на 6 счётов\n\nПовтори 5 раз. Дыши спокойно. Я рядом ❤️');
+    }
+    
+    function showMeditation() {
+        alert('🧘 *Короткая медитация*\n\nСядь удобно, закрой глаза.\nПредставь, что ты в безопасном месте.\nДыши спокойно 2 минуты.\nТы в порядке. Ты справляешься. Я здесь ✨');
+    }
+    
+    function showJournal() {
+        const note = prompt('📝 Напиши, что ты сейчас чувствуешь (это останется только у тебя):');
+        if (note) {
+            alert('✨ Твои чувства записаны. Дыши глубже, ты справишься ❤️');
+        }
+    }
 
     document.querySelectorAll('.mood-btn').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -1144,11 +1327,21 @@
     const savedHasPartner = localStorage.getItem('hasPartner');
     if (savedHasPartner === 'false') appState.hasPartner = false;
     
-    // Загружаем статус чек-листа
     appState.checklistCompleted = localStorage.getItem('checklistCompleted') === 'true';
     
     if (appState.partnerChatId) goToPage(6);
     else goToPage(1);
+    
+    // Запускаем проверку уведомлений каждый час
+    setInterval(() => {
+        checkPhaseAndNotify();
+        sendAutoMessage();
+    }, 60 * 60 * 1000);
+    
+    // Если уведомления уже разрешены, планируем ежедневное напоминание
+    if (Notification.permission === "granted") {
+        scheduleDailyNotification();
+    }
 </script>
 </body>
 </html>
