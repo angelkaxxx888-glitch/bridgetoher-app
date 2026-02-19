@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTH · BridgeToHer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            color: #e0e0ff;
+        }
+        
+        .app {
+            max-width: 420px;
+            width: 100%;
+            background: rgba(30, 30, 60, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 40px;
+            padding: 24px 20px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(180, 154, 255, 0.2);
+            position: relative;
+        }
+        
+        .progress {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+        .progress-step {
+            width: 40px;
+            height: 4px;
+            background: rgba(180, 154, 255, 0.2);
+            border-radius: 4px;
+            transition: 0.3s;
+        }
+        .progress-step.active {
+            background: #b49aff;
+            box-shadow: 0 0 10px rgba(180, 154, 255, 0.7);
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .logo-bth {
+            font-size: 48px;
+            font-weight: 800;
+            color: #b49aff;
+            letter-spacing: 4px;
+            text-shadow: 0 0 30px rgba(180, 154, 255, 0.7);
+            margin-bottom: 8px;
+        }
+        .logo-full {
+            font-size: 18px;
+            color: #c0b0ff;
+            letter-spacing: 2px;
+            opacity: 0.9;
+        }
+        
+        h2 {
+            font-size: 24px;
+            color: #b49aff;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        h3 {
+            font-size: 18px;
+            color: #c0b0ff;
+            margin: 24px 0 12px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 16px 20px;
+            border: none;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 8px 0;
+            background: linear-gradient(135deg, #b49aff, #9a7fff);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(180, 154, 255, 0.4);
+        }
+        .secondary-btn {
+            background: transparent;
+            border: 1px solid #b49aff;
+            color: #b49aff;
+        }
+        .secondary-btn:hover {
+            background: rgba(180, 154, 255, 0.1);
+        }
+        .back-btn {
+            background: transparent;
+            border: none;
+            color: #9a8db3;
+            font-size: 14px;
+            margin: 0 0 16px;
+            text-align: left;
+            padding: 8px 0;
+            width: auto;
+            display: inline-block;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .nav-buttons button {
+            flex: 1;
+            margin: 0;
+        }
+        .forward-btn {
+            background: linear-gradient(135deg, #b49aff, #7b68ae);
+        }
+        
+        .phase-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            border-bottom: 1px solid rgba(180, 154, 255, 0.2);
+            padding-bottom: 12px;
+        }
+        .phase-tab {
+            padding: 8px 16px;
+            border-radius: 40px;
+            background: rgba(180, 154, 255, 0.1);
+            border: 1px solid rgba(180, 154, 255, 0.2);
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #c0b0ff;
+        }
+        .phase-tab:hover {
+            background: rgba(180, 154, 255, 0.2);
+        }
+        .phase-tab.active {
+            background: #b49aff;
+            color: white;
+            border-color: #b49aff;
+        }
+        .phase-content {
+            display: none;
+        }
+        .phase-content.active {
+            display: block;
+        }
+        
+        .question {
+            background: rgba(50, 50, 80, 0.6);
+            border-radius: 20px;
+            padding: 16px;
+            margin: 16px 0;
+            border: 1px solid rgba(180, 154, 255, 0.2);
+        }
+        .q-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #d0c0ff;
+        }
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(70, 70, 100, 0.4);
+            border-radius: 12px;
+            margin: 8px 0;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .option:hover {
+            background: rgba(100, 100, 140, 0.4);
+        }
+        .option input[type="checkbox"] {
+            accent-color: #b49aff;
+            width: 18px;
+            height: 18px;
+        }
+        
+        .mood-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .mood-btn {
+            background: rgba(180, 154, 255, 0.15);
+            border: 1px solid rgba(180, 154, 255, 0.3);
+            border-radius: 20px;
+            padding: 16px 8px;
+            font-size: 15px;
+            color: #e0e0ff;
+            cursor: pointer;
+            transition: all 0.25s;
+            text-align: center;
+            margin: 0;
+        }
+        .mood-btn:hover {
+            background: rgba(180, 154, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        .mood-btn.active {
+            background: #b49aff;
+            color: white;
+            box-shadow: 0 8px 25px rgba(180, 154, 255, 0.5);
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 16px;
+            border: 1px solid rgba(180, 154, 255, 0.3);
+            border-radius: 24px;
+            background: rgba(30, 30, 60, 0.6);
+            color: white;
+            font-size: 15px;
+            margin: 16px 0;
+            resize: vertical;
+        }
+        
+        .success {
+            background: rgba(100, 255, 150, 0.2);
+            color: #90ffaa;
+            padding: 12px;
+            border-radius: 40px;
+            text-align: center;
+            margin: 16px 0;
+            display: none;
+        }
+        
+        .partner-card {
+            background: rgba(180, 154, 255, 0.15);
+            border-radius: 20px;
+            padding: 16px;
+            margin: 20px 0;
+            border: 1px solid rgba(180, 154, 255, 0.3);
+        }
+        
+        .footer {
+            text-align: center;
+            color: #9a8db3;
+            font-size: 12px;
+            margin-top: 24px;
+        }
+        
+        .settings-group {
+            margin: 24px 0;
+        }
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(180, 154, 255, 0.2);
+        }
+        .settings-label {
+            color: #c0b0ff;
+        }
+        select, input[type="time"], input[type="text"] {
+            background: rgba(30, 30, 60, 0.8);
+            border: 1px solid rgba(180, 154, 255, 0.3);
+            border-radius: 20px;
+            padding: 8px 16px;
+            color: white;
+            width: 100%;
+            margin: 8px 0;
+        }
+        
+        .qr-code {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .qr-code img {
+            width: 200px;
+            height: 200px;
+            border-radius: 20px;
+            background: white;
+            padding: 10px;
+        }
+        .invite-link {
+            background: rgba(180, 154, 255, 0.1);
+            border: 1px solid rgba(180, 154, 255, 0.3);
+            border-radius: 20px;
+            padding: 12px;
+            text-align: center;
+            word-break: break-all;
+            margin: 16px 0;
+            color: #b49aff;
+        }
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 16px 0;
+        }
+        .share-buttons button {
+            flex: 1;
+            padding: 12px;
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        .self-care-message {
+            background: rgba(180, 154, 255, 0.2);
+            border: 1px solid #b49aff;
+            border-radius: 24px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            color: white;
+            font-size: 18px;
+            line-height: 1.6;
+            box-shadow: 0 0 30px rgba(180, 154, 255, 0.3);
+        }
+        .self-care-message small {
+            font-size: 14px;
+            color: #c0b0ff;
+            margin-top: 12px;
+            display: block;
+        }
+        
+        /* Стили для календаря */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+        }
+        .calendar-header button {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            font-size: 20px;
+            background: transparent;
+            border: 1px solid #b49aff;
+            color: #b49aff;
+        }
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 8px;
+            text-align: center;
+            color: #9a8db3;
+            font-size: 12px;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+        .calendar-day {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            position: relative;
+            transition: 0.2s;
+        }
+        .calendar-day:hover {
+            transform: scale(1.1);
+        }
+        .calendar-day span {
+            position: relative;
+            z-index: 2;
+        }
+        .day-icon {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            font-size: 10px;
+        }
+        .legend {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: #9a8db3;
+        }
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+        
+        .stats-card {
+            background: rgba(180, 154, 255, 0.15);
+            border-radius: 20px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(180, 154, 255, 0.2);
+        }
+        
+        .planner-card {
+            background: rgba(255, 105, 180, 0.15);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            border-radius: 20px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+        .planner-result {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .support-tip {
+            background: rgba(100, 150, 255, 0.15);
+            border-left: 4px solid #b49aff;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 0 12px 12px 0;
+        }
+        
+        .technique-btn {
+            background: rgba(180, 154, 255, 0.1);
+            border: 1px solid #b49aff;
+            border-radius: 16px;
+            padding: 12px;
+            margin: 8px 0;
+            cursor: pointer;
+            text-align: center;
+        }
+        .technique-btn:hover {
+            background: rgba(180, 154, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+    <div class="logo">
+        <div class="logo-bth">BTH</div>
+        <div class="logo-full">BridgeToHer</div>
+    </div>
+
+    <div class="progress" id="progressBar">
+        <div class="progress-step" id="progress1"></div>
+        <div class="progress-step" id="progress2"></div>
+        <div class="progress-step" id="progress3"></div>
+        <div class="progress-step" id="progress4"></div>
+        <div class="progress-step" id="progress5"></div>
+        <div class="progress-step" id="progress6"></div>
+    </div>
+
+    <!-- СТРАНИЦА 1: Приветствие -->
+    <div id="page1" style="display: block;">
+        <h2>Мост к ней</h2>
+        <div style="margin: 40px 0; text-align: center; line-height: 1.8;">
+            <p>Привет.</p>
+            <p style="margin: 20px 0;">Это приложение — мост между твоим настроением и его пониманием.</p>
+            <p>Ответь на несколько вопросов — и он будет знать, как тебя поддержать.</p>
+            <p style="margin-top: 20px; color: #b49aff;">А если его нет — я поддержу тебя сама ❤️</p>
+        </div>
+        
+        <div class="nav-buttons">
+            <button onclick="goToPage(2)" class="forward-btn">Вперёд →</button>
+        </div>
+        <button class="secondary-btn" onclick="goToPage(6)">🌙 Сразу к настроению</button>
+    </div>
+
+    <!-- СТРАНИЦА 2: Приглашение партнёра -->
+    <div id="page2" style="display: none;">
+        <button class="back-btn" onclick="goToPage(1)">← Назад</button>
+        
+        <h2>📲 Пригласить партнёра</h2>
+        
+        <div class="qr-code" id="qrContainer"></div>
+        
+        <div class="invite-link" id="inviteLink">
+            https://t.me/BridgeToHer_bot
+        </div>
+        
+        <div class="share-buttons">
+            <button class="secondary-btn" onclick="copyLink()">📋 Скопировать</button>
+            <button class="secondary-btn" onclick="shareLink()">📤 Поделиться</button>
+        </div>
+        
+        <div style="margin: 20px 0;">
+            <button class="secondary-btn" onclick="checkPartner()">🔍 Проверить подключение</button>
+        </div>
+        
+        <div id="partnerStatus" style="min-height: 60px;"></div>
+        
+        <div class="nav-buttons">
+            <button class="secondary-btn" onclick="goToPage(3)">⏰ Пригласить позже</button>
+            <button class="forward-btn" onclick="goToPage(3)">Вперёд →</button>
+        </div>
+        
+        <button class="secondary-btn" onclick="setNoPartner()" style="border-color: #ff69b4; color: #ff69b4; margin-top: 8px;">
+            🌸 Нет парня
+        </button>
+    </div>
+
+    <!-- СТРАНИЦА 3: Чек-лист по фазам -->
+    <div id="page3" style="display: none;">
+        <button class="back-btn" onclick="goToPage(2)">← Назад</button>
+        
+        <h2>📋 Расскажи о себе</h2>
+        
+        <div class="phase-tabs">
+            <div class="phase-tab active" onclick="showPhase('pms')">🌧 ПМС</div>
+            <div class="phase-tab" onclick="showPhase('mens')">🌊 Менструация</div>
+            <div class="phase-tab" onclick="showPhase('ovul')">🌸 Овуляция</div>
+            <div class="phase-tab" onclick="showPhase('luteal')">🌙 Лютеиновая</div>
+            <div class="phase-tab" onclick="showPhase('follic')">🌱 Фолликулярная</div>
+        </div>
+        
+        <!-- ПМС -->
+        <div id="phase-pms" class="phase-content active">
+            <div class="question">
+                <div class="q-title">1. Какое настроение преобладает? (можно выбрать несколько)</div>
+                <div class="option"><input type="checkbox" class="pms-mood"> 😠 раздражительное</div>
+                <div class="option"><input type="checkbox" class="pms-mood"> 😭 плаксивое</div>
+                <div class="option"><input type="checkbox" class="pms-mood"> 😌 спокойное</div>
+                <div class="option"><input type="checkbox" class="pms-mood"> 😴 апатичное</div>
+            </div>
+            <div class="question">
+                <div class="q-title">2. Физические ощущения? (можно выбрать несколько)</div>
+                <div class="option"><input type="checkbox" class="pms-phys"> 🍰 тянет на сладкое</div>
+                <div class="option"><input type="checkbox" class="pms-phys"> 💔 тяжесть в груди</div>
+                <div class="option"><input type="checkbox" class="pms-phys"> 🤰 вздутие живота</div>
+                <div class="option"><input type="checkbox" class="pms-phys"> 😫 ничего особенного</div>
+            </div>
+            <div class="question">
+                <div class="q-title">3. Чего хочется больше всего? (можно выбрать несколько)</div>
+                <div class="option"><input type="checkbox" class="pms-want"> 🤗 чтобы обняли</div>
+                <div class="option"><input type="checkbox" class="pms-want"> 🧘 побыть одной</div>
+                <div class="option"><input type="checkbox" class="pms-want"> 🍫 съесть что-то вкусное</div>
+                <div class="option"><input type="checkbox" class="pms-want"> 🛌 просто лежать</div>
+                <div class="option"><input type="checkbox" class="pms-want"> 🧹 помощь по дому</div>
+            </div>
+        </div>
+        
+        <!-- Менструация -->
+        <div id="phase-mens" class="phase-content">
+            <div class="question">
+                <div class="q-title">1. Как проходит первый день? (можно выбрать несколько)</div>
+                <div class="option"><input type="checkbox" class="mens1"> 🔥 очень болезненно</div>
+                <div class="option"><input type="checkbox" class="mens1"> 😣 терпимо</div>
+                <div class="option"><input type="checkbox" class="mens1"> 🙂 нормально</div>
+            </div>
+            <div class="question">
+                <div class="q-title">2. Что помогает? (можно выбрать несколько)</div>
+                <div class="option"><input type="checkbox" class="mens2"> 🛏 лежать и отдыхать</div>
+                <div class="option"><input type="checkbox" class="mens2"> 🌡 грелка</div>
+                <div class="option"><input type="checkbox" class="mens2"> ☕ тёплое питьё</div>
+                <div class="option"><input type="checkbox" class="mens2"> 🍫 шоколад</div>
+            </div>
+            <div class="question">
+                <div class="q-title">3. Чего хочется от партнёра? (можно выбрать несколько)</div>
+                <div class="option"><input type="checkbox" class="mens3"> 🤗 просто быть рядом</div>
+                <div class="option"><input type="checkbox" class="mens3"> 💆 погладить живот</div>
+                <div class="option"><input type="checkbox" class="mens3"> ☕ принести чай</div>
+                <div class="option"><input type="checkbox" class="mens3"> 🤫 оставить в покое</div>
+            </div>
+        </div>
+        
+        <!-- Овуляция -->
+        <div id="phase-ovul" class="phase-content">
+            <div class="question">
+                <div class="q-title">1. Как чувствуешь себя сегодня? (можно выбрать несколько)</div>
+                <div class="option"><input type="checkbox" class="ovul1"> 🔥 особенно привлекательной</div>
+                <div class="option"><input type="checkbox" class="ovul1"> 💃 энергичной</div>
+                <div class="option"><input type="checkbox" class="ovul1"> 🌸 цветущей</div>
+            </div>
+            <div class="question">
+                <div class="q-title">2. Чего хочется? (можно выбрать несколько)</div>
+                <div class="option"><input type="checkbox" class="ovul2"> 🌹 цветов</div>
+                <div class="option"><input type="checkbox" class="ovul2"> 💕 комплиментов</div>
+                <div class="option"><input type="checkbox" class="ovul2"> 🔥 страсти</div>
+                <div class="option"><input type="checkbox" class="ovul2"> 🎁 сюрпризов</div>
+            </div>
+        </div>
+        
+        <!-- Лютеиновая -->
+        <div id="phase-luteal" class="phase-content">
+            <div class="question">
+                <div class="q-title">1. Общее самочувствие? (можно выбрать несколько)</div>
+                <div class="option"><input type="checkbox" class="lut1"> 😌 стабильное</div>
+                <div class="option"><input type="checkbox" class="lut1"> 🌊 ровное</div>
+                <div class="option"><input type="checkbox" class="lut1"> 😴 уставшее</div>
+            </div>
+            <div class="question">
+                <div class="q-title">2. Чего хочется от партнёра? (можно выбрать несколько)</div>
+                <div class="option"><input type="checkbox" class="lut2"> 🤗 заботы</div>
+                <div class="option"><input type="checkbox" class="lut2"> 💬 разговоров</div>
+                <div class="option"><input type="checkbox" class="lut2"> 🎬 совместного отдыха</div>
+            </div>
+        </div>
+        
+        <!-- Фолликулярная -->
+        <div id="phase-follic" class="phase-content">
+            <div class="question">
+                <div class="q-title">1. Настроение? (можно выбрать несколько)</div>
+                <div class="option"><input type="checkbox" class="fol1"> 😊 приподнятое</div>
+                <div class="option"><input type="checkbox" class="fol1"> 🌱 спокойное</div>
+                <div class="option"><input type="checkbox" class="fol1"> ⚡ энергичное</div>
+            </div>
+            <div class="question">
+                <div class="q-title">2. Чего хочется делать? (можно выбрать несколько)</div>
+                <div class="option"><input type="checkbox" class="fol2"> 🎨 творить</div>
+                <div class="option"><input type="checkbox" class="fol2"> 🏃 двигаться</div>
+                <div class="option"><input type="checkbox" class="fol2"> 👥 общаться</div>
+            </div>
+        </div>
+        
+        <button onclick="saveChecklist()">💾 Сохранить</button>
+        <div class="nav-buttons">
+            <button class="secondary-btn" onclick="goToPage(2)">← Назад</button>
+            <button class="forward-btn" onclick="goToPage(4)">Вперёд →</button>
+        </div>
+    </div>
+
+    <!-- СТРАНИЦА 4: Календарь и прогноз на 12 месяцев -->
+    <div id="page4" style="display: none;">
+        <button class="back-btn" onclick="goToPage(3)">← Назад</button>
+        
+        <h2>📅 Календарь цикла</h2>
+        
+        <!-- Переключатель количества месяцев -->
+        <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 16px;">
+            <button class="secondary-btn" style="width: auto; padding: 8px 16px;" onclick="setMonthsView(1)">1 мес</button>
+            <button class="secondary-btn" style="width: auto; padding: 8px 16px;" onclick="setMonthsView(3)">3 мес</button>
+            <button class="secondary-btn" style="width: auto; padding: 8px 16px; background: #b49aff; color: white;" onclick="setMonthsView(12)" id="months12Btn">12 мес</button>
+        </div>
+        
+        <!-- Навигация по месяцам -->
+        <div class="calendar-header">
+            <button onclick="changeMonth(-1)">←</button>
+            <span style="font-size: 18px; color: #c0b0ff;" id="monthYearDisplay">Февраль 2026</span>
+            <button onclick="changeMonth(1)">→</button>
+        </div>
+        
+        <!-- Дни недели -->
+        <div class="calendar-weekdays">
+            <div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div>
+        </div>
+        
+        <!-- Сетка календаря -->
+        <div class="calendar-grid" id="calendarGrid"></div>
+        
+        <!-- Легенда -->
+        <div class="legend">
+            <div class="legend-item"><div class="legend-color" style="background: rgba(180,154,255,0.1);"></div> Обычный</div>
+            <div class="legend-item"><div class="legend-color" style="background: #ff69b4;"></div> Менструация</div>
+            <div class="legend-item"><div class="legend-color" style="background: rgba(255,105,180,0.5);"></div> Прогноз</div>
+            <div class="legend-item"><div class="legend-color" style="background: #b49aff;"></div> Овуляция</div>
+            <div class="legend-item"><div class="legend-color" style="background: rgba(180,154,255,0.5);"></div> ПМС</div>
+        </div>
+        
+        <!-- Статистика -->
+        <div class="stats-card">
+            <h3 style="margin-top: 0;">📊 Статистика</h3>
+            <div class="stats-row"><span>Средняя длина цикла:</span> <span id="avgCycleLength">—</span></div>
+            <div class="stats-row"><span>Регулярность:</span> <span id="regularity">—</span></div>
+            <div class="stats-row"><span>Отмечено циклов:</span> <span id="cyclesCount">0</span></div>
+            <div class="stats-row"><span>Последняя менструация:</span> <span id="lastPeriod">—</span></div>
+        </div>
+        
+        <!-- Планировщик -->
+        <div class="planner-card">
+            <h3 style="margin-top: 0;">🗓 Планировщик</h3>
+            <div style="display: flex; gap: 8px;">
+                <input type="date" id="plannerStart" style="flex: 1;">
+                <input type="date" id="plannerEnd" style="flex: 1;">
+            </div>
+            <button onclick="checkPlanner()" class="secondary-btn" style="margin-top: 8px;">Проверить</button>
+            <div id="plannerResult" class="planner-result" style="display: none;"></div>
+        </div>
+        
+        <!-- Кнопка сохранения -->
+        <button onclick="saveCycle()" style="background: #4CAF50; margin-top: 16px;">💾 Сохранить календарь</button>
+        
+        <div class="nav-buttons" style="margin-top: 16px;">
+            <button class="secondary-btn" onclick="goToPage(3)">← Назад</button>
+            <button class="forward-btn" onclick="goToPage(5)">Вперёд →</button>
+        </div>
+    </div>
+
+    <!-- СТРАНИЦА 5: Настройки -->
+    <div id="page5" style="display: none;">
+        <button class="back-btn" onclick="goToPage(4)">← Назад</button>
+        
+        <h2>⚙️ Настройки</h2>
+        
+        <div class="settings-group">
+            <h3>🔔 Уведомления для меня</h3>
+            <div class="settings-item">
+                <span class="settings-label">Напоминания</span>
+                <select id="reminderFrequency">
+                    <option>Каждый день</option>
+                    <option selected>Только важные фазы</option>
+                    <option>Не беспокоить</option>
+                </select>
+            </div>
+            <div class="settings-item">
+                <span class="settings-label">Время</span>
+                <input type="time" id="reminderTime" value="20:00">
+            </div>
+        </div>
+        
+        <div class="settings-group">
+            <h3>💬 Для партнёра</h3>
+            <div class="settings-item">
+                <span class="settings-label">Частота</span>
+                <select id="partnerFrequency">
+                    <option>Раз в день</option>
+                    <option selected>Только важные дни</option>
+                    <option>По расписанию</option>
+                </select>
+            </div>
+            <div class="settings-item">
+                <span class="settings-label">Имя партнёра</span>
+                <input type="text" id="partnerName" placeholder="Алексей" value="">
+            </div>
+        </div>
+        
+        <div class="settings-group">
+            <h3>🎨 Оформление</h3>
+            <div class="settings-item">
+                <span class="settings-label">Тема</span>
+                <select id="theme">
+                    <option selected>Космическая</option>
+                    <option>Лавандовая</option>
+                    <option>Нежно-розовая</option>
+                    <option>Мятная</option>
+                </select>
+            </div>
+        </div>
+        
+        <button onclick="saveSettings()">💾 Сохранить</button>
+        <div class="nav-buttons">
+            <button class="secondary-btn" onclick="goToPage(4)">← Назад</button>
+            <button class="forward-btn" onclick="goToPage(6)">Вперёд →</button>
+        </div>
+    </div>
+
+    <!-- СТРАНИЦА 6: Ежедневное настроение + поддержка -->
+    <div id="page6" style="display: none;">
+        <button class="back-btn" onclick="goToPage(5)">← Назад</button>
+        
+        <h2>🌸 Как ты сегодня?</h2>
+        
+        <!-- Блок поддержки -->
+        <div id="supportMessage" class="support-tip" style="display: none;"></div>
+        
+        <!-- Интерактивные техники (появляются если нет партнёра) -->
+        <div id="selfCareTools" style="display: none;">
+            <div class="technique-btn" onclick="showBreathing()">🌬 Дыхательное упражнение</div>
+            <div class="technique-btn" onclick="showMeditation()">🧘 Короткая медитация</div>
+            <div class="technique-btn" onclick="showJournal()">📝 Рефлексивное письмо</div>
+        </div>
+        
+        <!-- Сообщение самоподдержки (если нет партнёра) -->
+        <div id="selfCareMessage" class="self-care-message" style="display: none;"></div>
+        
+        <!-- Кнопки настроения -->
+        <div class="mood-buttons">
+            <div class="mood-btn" data-mood="calm">😌 спокойно</div>
+            <div class="mood-btn" data-mood="tender">🥰 нежность</div>
+            <div class="mood-btn" data-mood="joy">😊 радость</div>
+            <div class="mood-btn" data-mood="passion">🔥 страсть</div>
+            <div class="mood-btn" data-mood="tired">😴 усталость</div>
+            <div class="mood-btn" data-mood="irritated">😠 раздражение</div>
+            <div class="mood-btn" data-mood="sad">😭 грусть</div>
+            <div class="mood-btn" data-mood="sick">🤢 тошнота</div>
+            <div class="mood-btn" data-mood="apathy">😞 апатия</div>
+            <div class="mood-btn" data-mood="fog">🌫 туман</div>
+        </div>
+        
+        <textarea id="dailyNote" placeholder="Заметка..."></textarea>
+        
+        <button id="sendDailyBtn">💌 Отправить</button>
+        
+        <div id="successMsg" class="success">✅ Отправлено!</div>
+        
+        <div class="nav-buttons">
+            <button class="secondary-btn" onclick="goToPage(4)">📅 Календарь</button>
+            <button class="secondary-btn" onclick="goToPage(5)">⚙️ Настройки</button>
+        </div>
+    </div>
+    
+    <div class="footer">BTH · BridgeToHer · мост к ней</div>
+</div>
+
+<script>
+    // ==================== КОНФИГУРАЦИЯ ====================
+    const PROXY_URL = 'https://hervibe-proxy.onrender.com';
+    const BOT_LINK = 'https://t.me/BridgeToHer_bot';
+    const BOT_USERNAME = 'BridgeToHer_bot';
+    
+    // Состояние приложения
+    let appState = {
+        partnerChatId: localStorage.getItem('partnerChatId') || '',
+        partnerName: localStorage.getItem('partnerName') || '',
+        hasPartner: localStorage.getItem('hasPartner') !== 'false',
+        checklist: {}
+    };
+
+    // ==================== НАВИГАЦИЯ ====================
+    function goToPage(pageNum) {
+        for (let i = 1; i <= 6; i++) {
+            const page = document.getElementById(`page${i}`);
+            if (page) page.style.display = 'none';
+        }
+        
+        const targetPage = document.getElementById(`page${pageNum}`);
+        if (targetPage) targetPage.style.display = 'block';
+        
+        if (pageNum === 4) {
+            renderCalendar();
+            updateStats();
+        }
+        if (pageNum === 2) generateQR();
+        if (pageNum === 6) {
+            checkAndShowSupport();
+        }
+        
+        for (let i = 1; i <= 6; i++) {
+            const step = document.getElementById(`progress${i}`);
+            if (step) {
+                if (i <= pageNum) step.classList.add('active');
+                else step.classList.remove('active');
+            }
+        }
+    }
+
+    // ==================== ПОДДЕРЖКА (режим без партнёра) ====================
+    function checkAndShowSupport() {
+        if (!appState.hasPartner) {
+            document.getElementById('selfCareTools').style.display = 'block';
+            
+            // Определяем фазу и показываем поддержку
+            const cyclePhase = getCurrentPhase();
+            const supportMessage = getPhaseSupport(cyclePhase);
+            
+            const supportDiv = document.getElementById('supportMessage');
+            supportDiv.style.display = 'block';
+            supportDiv.innerHTML = supportMessage;
+        } else {
+            document.getElementById('selfCareTools').style.display = 'none';
+            document.getElementById('supportMessage').style.display = 'none';
+        }
+    }
+    
+    function getCurrentPhase() {
+        if (!cycleData.periods || cycleData.periods.length === 0) return 'unknown';
+        
+        const today = new Date().toISOString().split('T')[0];
+        const lastPeriod = cycleData.periods[cycleData.periods.length - 1];
+        
+        if (!lastPeriod) return 'unknown';
+        
+        const lastDate = new Date(lastPeriod);
+        const todayDate = new Date();
+        const daysDiff = Math.floor((todayDate - lastDate) / (1000 * 60 * 60 * 24));
+        
+        if (daysDiff < 7) return 'menstruation';
+        if (daysDiff >= 7 && daysDiff < 14) return 'follicular';
+        if (daysDiff >= 14 && daysDiff < 16) return 'ovulation';
+        if (daysDiff >= 16 && daysDiff < 25) return 'luteal';
+        if (daysDiff >= 25) return 'pms';
+        
+        return 'unknown';
+    }
+    
+    function getPhaseSupport(phase) {
+        const messages = {
+            'pms': '🌪 Похоже, у тебя сейчас ПМС. В такие дни многие женщины чувствуют раздражительность и усталость. Это нормально. Будь к себе добрее ❤️',
+            'menstruation': '🌊 Первый день цикла может быть тяжёлым. Позволь себе отдохнуть. Ты молодец ❤️',
+            'ovulation': '🌸 Сегодня твоя энергия на пике! Отличное время для важных дел и романтики ✨',
+            'follicular': '🌱 После менструации силы возвращаются. Хорошее время для новых начинаний!',
+            'luteal': '🌙 Лютеиновая фаза — время прислушаться к себе. Не перегружай себя, отдыхай.',
+            'unknown': '🌸 Я здесь, чтобы поддержать тебя в любой день. Расскажи, что чувствуешь?'
+        };
+        return messages[phase] || messages.unknown;
+    }
+    
+    function showBreathing() {
+        alert('🌬 Дыхательное упражнение:\n\nВдох на 4 счёта\nЗадержка дыхания на 4 счёта\nВыдох на 6 счётов\nПовтори 5 раз');
+    }
+    
+    function showMeditation() {
+        alert('🧘 Короткая медитация:\n\nСядь удобно, закрой глаза.\nПредставь, что ты в безопасном месте.\nДыши спокойно 2 минуты.\nТы в порядке.');
+    }
+    
+    function showJournal() {
+        const note = prompt('📝 Напиши, что ты сейчас чувствуешь (это останется только у тебя):');
+        if (note) {
+            alert('✨ Твои чувства записаны. Дыши глубже, ты справишься ❤️');
+        }
+    }
+
+    // ==================== ПРИГЛАШЕНИЕ ПАРТНЁРА ====================
+    function generateQR() {
+        const qrContainer = document.getElementById('qrContainer');
+        qrContainer.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(BOT_LINK)}" alt="QR-код">`;
+    }
+    
+    function copyLink() {
+        navigator.clipboard.writeText(BOT_LINK);
+        alert('Ссылка скопирована!');
+    }
+    
+    function shareLink() {
+        if (navigator.share) {
+            navigator.share({
+                title: 'BridgeToHer',
+                text: 'Присоединяйся к моему приложению BridgeToHer!',
+                url: BOT_LINK
+            });
+        } else {
+            copyLink();
+        }
+    }
+    
+    function setNoPartner() {
+        appState.hasPartner = false;
+        localStorage.setItem('hasPartner', 'false');
+        goToPage(3);
+    }
+    
+    async function checkPartner() {
+        const statusDiv = document.getElementById('partnerStatus');
+        statusDiv.innerHTML = '🔍 Проверяем...';
+        
+        try {
+            const response = await fetch(`${PROXY_URL}/get-updates`);
+            const data = await response.json();
+            
+            if (data.ok && data.result && data.result.length > 0) {
+                const updates = data.result.reverse();
+                let foundPartner = null;
+                
+                for (const update of updates) {
+                    if (update.message && update.message.text && update.message.text.includes('/start')) {
+                        foundPartner = {
+                            chatId: update.message.chat.id.toString(),
+                            name: (update.message.from.first_name || '') + ' ' + (update.message.from.last_name || '')
+                        };
+                        break;
+                    }
+                }
+                
+                if (foundPartner) {
+                    appState.partnerChatId = foundPartner.chatId;
+                    appState.partnerName = foundPartner.name.trim() || 'партнёр';
+                    appState.hasPartner = true;
+                    
+                    localStorage.setItem('partnerChatId', appState.partnerChatId);
+                    localStorage.setItem('partnerName', appState.partnerName);
+                    localStorage.setItem('hasPartner', 'true');
+                    
+                    statusDiv.innerHTML = `
+                        <div style="background: rgba(76, 175, 80, 0.2); padding: 16px; border-radius: 16px;">
+                            ✅ Подключён: ${appState.partnerName}
+                        </div>
+                    `;
+                    
+                    await fetch(`${PROXY_URL}/send-message`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chat_id: foundPartner.chatId,
+                            text: '🎉 *Ты подключён к BridgeToHer!*\n\nТеперь твоя партнёрша может отправлять тебе уведомления о своём настроении.'
+                        })
+                    });
+                    
+                    setTimeout(() => goToPage(3), 1500);
+                } else {
+                    statusDiv.innerHTML = '❌ Партнёр ещё не нажал /start. Попроси его открыть бота и нажать "Start".';
+                }
+            } else {
+                statusDiv.innerHTML = '❌ Ошибка подключения. Попробуй позже.';
+            }
+        } catch (error) {
+            statusDiv.innerHTML = '❌ Ошибка: ' + error.message;
+        }
+    }
+
+    // ==================== ПЕРЕКЛЮЧЕНИЕ ФАЗ ====================
+    function showPhase(phaseId) {
+        document.querySelectorAll('.phase-tab').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.phase-content').forEach(content => content.classList.remove('active'));
+        
+        event.target.classList.add('active');
+        document.getElementById(`phase-${phaseId}`).classList.add('active');
+    }
+
+    // ==================== СОХРАНЕНИЕ ЧЕК-ЛИСТА ====================
+    function saveChecklist() {
+        alert('✅ Настройки сохранены!');
+        goToPage(4);
+    }
+
+    // ==================== СОХРАНЕНИЕ НАСТРОЕК ====================
+    function saveSettings() {
+        const partnerName = document.getElementById('partnerName').value;
+        if (partnerName) {
+            appState.partnerName = partnerName;
+            localStorage.setItem('partnerName', partnerName);
+        }
+        alert('✅ Настройки сохранены!');
+    }
+
+    // ==================== КАЛЕНДАРЬ И ПРОГНОЗ ====================
+    let currentDate = new Date();
+    let currentMonth = currentDate.getMonth();
+    let currentYear = currentDate.getFullYear();
+    let monthsView = 12; // по умолчанию показываем 12 месяцев
+    
+    let cycleData = JSON.parse(localStorage.getItem('cycleData')) || { periods: [] };
+    
+    function setMonthsView(months) {
+        monthsView = months;
+        // Подсвечиваем активную кнопку
+        document.querySelectorAll('[onclick^="setMonthsView"]').forEach(btn => {
+            btn.style.background = 'transparent';
+            btn.style.color = '#b49aff';
+        });
+        if (months === 12) {
+            document.getElementById('months12Btn').style.background = '#b49aff';
+            document.getElementById('months12Btn').style.color = 'white';
+        }
+        renderCalendar();
+    }
+    
+    function renderCalendar() {
+        const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+        
+        // Показываем диапазон месяцев
+        let endMonth = currentMonth + (monthsView - 1);
+        let endYear = currentYear;
+        while (endMonth > 11) {
+            endMonth -= 12;
+            endYear++;
+        }
+        
+        let displayText = monthNames[currentMonth] + ' ' + currentYear;
+        if (monthsView > 1) {
+            displayText += ' — ' + monthNames[endMonth] + ' ' + endYear;
+        }
+        document.getElementById('monthYearDisplay').innerText = displayText;
+        
+        // Отрисовываем сетку для всех месяцев
+        let gridHtml = '';
+        let totalDays = 0;
+        
+        for (let m = 0; m < monthsView; m++) {
+            let month = currentMonth + m;
+            let year = currentYear;
+            while (month > 11) {
+                month -= 12;
+                year++;
+            }
+            
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            let startOffset = firstDay === 0 ? 6 : firstDay - 1;
+            
+            // Добавляем пустые ячейки для первого месяца
+            if (m === 0) {
+                for (let i = 0; i < startOffset; i++) {
+                    gridHtml += `<div class="calendar-day" style="visibility: hidden;"></div>`;
+                }
+            }
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+                const isPeriod = cycleData.periods.includes(dateStr);
+                
+                // Прогноз на основе последнего цикла
+                let isPredictedPeriod = false;
+                let isPredictedOvulation = false;
+                let isPMS = false;
+                
+                if (cycleData.periods.length > 0) {
+                    const lastPeriod = new Date(cycleData.periods[cycleData.periods.length - 1]);
+                    const avgCycle = calculateAvgCycle();
+                    
+                    if (avgCycle > 0) {
+                        // Рассчитываем прогноз на несколько циклов вперёд
+                        for (let cycle = 0; cycle < 3; cycle++) {
+                            const predictedDate = new Date(lastPeriod);
+                            predictedDate.setDate(lastPeriod.getDate() + (avgCycle * cycle));
+                            
+                            // Проверяем менструацию (±2 дня)
+                            const predictedStart = new Date(predictedDate);
+                            const predictedEnd = new Date(predictedDate);
+                            predictedEnd.setDate(predictedEnd.getDate() + 5);
+                            
+                            if (dateStr >= predictedStart.toISOString().split('T')[0] && 
+                                dateStr <= predictedEnd.toISOString().split('T')[0]) {
+                                isPredictedPeriod = true;
+                            }
+                            
+                            // Овуляция за 14 дней до следующей менструации
+                            const ovulationDate = new Date(predictedDate);
+                            ovulationDate.setDate(predictedDate.getDate() - 14);
+                            if (dateStr === ovulationDate.toISOString().split('T')[0]) {
+                                isPredictedOvulation = true;
+                            }
+                            
+                            // ПМС за 3-5 дней до менструации
+                            const pmsStart = new Date(predictedDate);
+                            pmsStart.setDate(predictedDate.getDate() - 5);
+                            const pmsEnd = new Date(predictedDate);
+                            pmsEnd.setDate(predictedDate.getDate() - 1);
+                            
+                            if (dateStr >= pmsStart.toISOString().split('T')[0] && 
+                                dateStr <= pmsEnd.toISOString().split('T')[0]) {
+                                isPMS = true;
+                            }
+                        }
+                    }
+                }
+                
+                let bgColor = 'rgba(180, 154, 255, 0.1)';
+                if (isPeriod) bgColor = '#ff69b4';
+                else if (isPredictedPeriod) bgColor = 'rgba(255, 105, 180, 0.5)';
+                else if (isPredictedOvulation) bgColor = '#b49aff';
+                else if (isPMS) bgColor = 'rgba(180, 154, 255, 0.5)';
+                
+                let icon = '';
+                if (isPeriod) icon = '💧';
+                else if (isPredictedOvulation) icon = '🌸';
+                else if (isPMS) icon = '🌪';
+                
+                const today = new Date().toISOString().split('T')[0];
+                if (dateStr === today) {
+                    bgColor = 'gold';
+                    icon = '✨';
+                }
+                
+                gridHtml += `
+                    <div class="calendar-day" style="background: ${bgColor};" onclick="togglePeriod('${dateStr}')">
+                        <span>${day}</span>
+                        ${icon ? `<span class="day-icon">${icon}</span>` : ''}
+                    </div>
+                `;
+            }
+        }
+        
+        document.getElementById('calendarGrid').innerHTML = gridHtml;
+    }
+    
+    function calculateAvgCycle() {
+        if (cycleData.periods.length < 2) return 0;
+        
+        let total = 0;
+        for (let i = 1; i < cycleData.periods.length; i++) {
+            const prev = new Date(cycleData.periods[i-1]);
+            const curr = new Date(cycleData.periods[i]);
+            const diff = Math.floor((curr - prev) / (1000 * 60 * 60 * 24));
+            total += diff;
+        }
+        return Math.round(total / (cycleData.periods.length - 1));
+    }
+    
+    function updateStats() {
+        const avgCycle = calculateAvgCycle();
+        document.getElementById('avgCycleLength').innerText = avgCycle ? avgCycle + ' дней' : '—';
+        
+        const cyclesCount = cycleData.periods.length;
+        document.getElementById('cyclesCount').innerText = cyclesCount;
+        
+        if (cyclesCount >= 3) {
+            let regular = true;
+            let lastCycle = 0;
+            for (let i = 1; i < cycleData.periods.length; i++) {
+                const prev = new Date(cycleData.periods[i-1]);
+                const curr = new Date(cycleData.periods[i]);
+                const diff = Math.floor((curr - prev) / (1000 * 60 * 60 * 24));
+                if (lastCycle && Math.abs(diff - lastCycle) > 5) regular = false;
+                lastCycle = diff;
+            }
+            document.getElementById('regularity').innerText = regular ? 'Стабильный' : 'Плавающий';
+        } else {
+            document.getElementById('regularity').innerText = '—';
+        }
+        
+        if (cycleData.periods.length > 0) {
+            const last = new Date(cycleData.periods[cycleData.periods.length - 1]);
+            document.getElementById('lastPeriod').innerText = last.toLocaleDateString('ru-RU');
+        } else {
+            document.getElementById('lastPeriod').innerText = '—';
+        }
+    }
+    
+    function changeMonth(delta) {
+        currentMonth += delta;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        } else if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        renderCalendar();
+    }
+    
+    function togglePeriod(dateStr) {
+        const index = cycleData.periods.indexOf(dateStr);
+        if (index === -1) {
+            cycleData.periods.push(dateStr);
+            cycleData.periods.sort();
+        } else {
+            cycleData.periods.splice(index, 1);
+        }
+        renderCalendar();
+        updateStats();
+    }
+    
+    function saveCycle() {
+        localStorage.setItem('cycleData', JSON.stringify(cycleData));
+        alert('✅ Календарь сохранён!');
+    }
+    
+    function checkPlanner() {
+        const start = document.getElementById('plannerStart').value;
+        const end = document.getElementById('plannerEnd').value;
+        
+        if (!start || !end) {
+            alert('Выбери начальную и конечную даты');
+            return;
+        }
+        
+        const startDate = new Date(start);
+        const endDate = new Date(end);
+        
+        let hasPeriod = false;
+        let hasOvulation = false;
+        let days = [];
+        
+        // Проверяем каждый день диапазона
+        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+            const dateStr = d.toISOString().split('T')[0];
+            
+            if (cycleData.periods.includes(dateStr)) {
+                hasPeriod = true;
+                days.push(dateStr);
+            }
+            
+            // Проверка прогноза
+            if (cycleData.periods.length > 0) {
+                const avgCycle = calculateAvgCycle();
+                if (avgCycle > 0) {
+                    const lastPeriod = new Date(cycleData.periods[cycleData.periods.length - 1]);
+                    for (let cycle = 0; cycle < 3; cycle++) {
+                        const ovulationDate = new Date(lastPeriod);
+                        ovulationDate.setDate(lastPeriod.getDate() + (avgCycle * cycle) - 14);
+                        if (dateStr === ovulationDate.toISOString().split('T')[0]) {
+                            hasOvulation = true;
+                        }
+                    }
+                }
+            }
+        }
+        
+        const resultDiv = document.getElementById('plannerResult');
+        resultDiv.style.display = 'block';
+        
+        if (hasPeriod) {
+            resultDiv.innerHTML = '⚠️ В выбранный период есть дни менструации. Возможно, стоит выбрать другие даты.';
+        } else if (hasOvulation) {
+            resultDiv.innerHTML = '🌸 В выбранный период есть овуляция. Отличное время для романтики!';
+        } else {
+            resultDiv.innerHTML = '✅ В выбранный период нет менструации. Можно планировать!';
+        }
+    }
+
+    // ==================== ОТПРАВКА ====================
+    function getSelfCareMessage(mood) {
+        const messages = {
+            'irritated': '🌪 Кажется, сегодня раздражение зашкаливает. Это нормально, особенно в ПМС. Дыши глубже, ты справишься. А если хочется побыть одной — это твоё право ❤️',
+            'tired': '🕯 Усталость — не слабость. Ты много делаешь, и сегодня можно просто лечь и ничего не делать. Я рядом, даже если ты молчишь.',
+            'tender': '💞 Нежность сегодня переполняет? Это прекрасно! Обними себя, включи любимый фильм, побудь в этом состоянии как можно дольше.',
+            'calm': '😌 Сегодня внутри тишина и покой. Наслаждайся этим днём, ты заслужила это спокойствие.',
+            'sad': '😭 Если грустно — поплачь. Слёзы очищают. Я здесь, чтобы просто быть рядом.',
+            'passion': '🔥 Энергия бьёт ключом! Самое время для ярких планов и смелых решений. Ты прекрасна!',
+            'joy': '😊 Радость — это твоё естественное состояние. Лови момент и делись им с миром!',
+            'sick': '🤢 Тошнота и дискомфорт — неприятные спутники. Позволь себе сегодня отдыхать столько, сколько нужно.',
+            'apathy': '😞 Апатия накрыла? Это пройдёт. Просто побудь в ней, не требуй от себя ничего. Я подожду.',
+            'fog': '🌫 Туман в голове — обычное дело. Не торопи себя, мысли прояснятся.'
+        };
+        return messages[mood] || '🌸 Я здесь, чтобы поддержать тебя в любой день.';
+    }
+
+    async function sendToTelegram(message) {
+        if (!appState.hasPartner) {
+            const selfCareDiv = document.getElementById('selfCareMessage');
+            selfCareDiv.style.display = 'block';
+            selfCareDiv.innerHTML = message + '<br><small>✨ это сообщение только для тебя</small>';
+            
+            document.getElementById('successMsg').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('successMsg').style.display = 'none';
+            }, 3000);
+            return true;
+        }
+        
+        if (!appState.partnerChatId) {
+            alert('Сначала пригласи партнёра!');
+            goToPage(2);
+            return false;
+        }
+        
+        try {
+            const response = await fetch(`${PROXY_URL}/send-message`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: appState.partnerChatId,
+                    text: message,
+                    parse_mode: 'Markdown'
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.ok) {
+                document.getElementById('successMsg').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('successMsg').style.display = 'none';
+                }, 3000);
+                return true;
+            } else {
+                alert('Ошибка отправки: ' + (data.description || 'неизвестная ошибка'));
+                return false;
+            }
+        } catch (error) {
+            alert('Ошибка соединения: ' + error.message);
+            return false;
+        }
+    }
+
+    // ==================== ОБРАБОТКА НАСТРОЕНИЯ ====================
+    document.querySelectorAll('.mood-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.classList.toggle('active');
+        });
+    });
+    
+    document.getElementById('sendDailyBtn').addEventListener('click', async function() {
+        const activeMoods = document.querySelectorAll('.mood-btn.active');
+        if (activeMoods.length === 0) {
+            alert('Выбери своё настроение');
+            return;
+        }
+        
+        const note = document.getElementById('dailyNote').value;
+        
+        const moodMap = {
+            'calm': '😌 спокойно',
+            'tender': '🥰 нежность',
+            'joy': '😊 радость',
+            'passion': '🔥 страсть',
+            'tired': '😴 усталость',
+            'irritated': '😠 раздражение',
+            'sad': '😭 грусть',
+            'sick': '🤢 тошнота',
+            'apathy': '😞 апатия',
+            'fog': '🌫 туман'
+        };
+        
+        let moodText = '';
+        activeMoods.forEach(btn => {
+            const mood = btn.dataset.mood;
+            moodText += moodMap[mood] + ' ';
+        });
+        
+        let message = `🌸 Сегодня я чувствую: ${moodText}`;
+        
+        if (note) {
+            message += `\n\n💬 Моя заметка: ${note}`;
+        }
+        
+        message += '\n\n— с любовью, BridgeToHer 🌉';
+        
+        if (!appState.hasPartner) {
+            const firstMood = activeMoods[0].dataset.mood;
+            const selfMessage = getSelfCareMessage(firstMood);
+            await sendToTelegram(selfMessage);
+        } else {
+            await sendToTelegram(message);
+        }
+        
+        activeMoods.forEach(btn => btn.classList.remove('active'));
+        document.getElementById('dailyNote').value = '';
+    });
+
+    // ==================== ИНИЦИАЛИЗАЦИЯ ====================
+    const savedHasPartner = localStorage.getItem('hasPartner');
+    if (savedHasPartner === 'false') {
+        appState.hasPartner = false;
+    }
+    
+    if (appState.partnerChatId) {
+        goToPage(6);
+    } else {
+        goToPage(1);
+    }
+</script>
+</body>
+</html>
