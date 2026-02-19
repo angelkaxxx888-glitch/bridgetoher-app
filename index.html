@@ -278,7 +278,7 @@
         .settings-label {
             color: #c0b0ff;
         }
-        select, input[type="time"], input[type="text"] {
+        select, input[type="time"], input[type="text"], input[type="number"] {
             background: rgba(30, 30, 60, 0.8);
             border: 1px solid rgba(180, 154, 255, 0.3);
             border-radius: 20px;
@@ -396,7 +396,7 @@
         }
         .legend {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             justify-content: center;
             margin: 20px 0;
             flex-wrap: wrap;
@@ -405,12 +405,12 @@
             display: flex;
             align-items: center;
             gap: 4px;
-            font-size: 12px;
+            font-size: 11px;
             color: #9a8db3;
         }
         .legend-color {
-            width: 16px;
-            height: 16px;
+            width: 12px;
+            height: 12px;
             border-radius: 4px;
         }
         
@@ -655,6 +655,19 @@
         
         <h2>📅 Календарь цикла</h2>
         
+        <!-- Настройка длины цикла -->
+        <div style="background: rgba(180, 154, 255, 0.15); border-radius: 20px; padding: 16px; margin-bottom: 16px;">
+            <h3 style="margin-top: 0;">📊 Настройка цикла</h3>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <span style="color: #c0b0ff; flex: 1;">Средняя длина цикла:</span>
+                <input type="number" id="manualCycleLength" min="20" max="40" value="28" style="width: 80px; text-align: center;">
+                <span style="color: #9a8db3;">дней</span>
+            </div>
+            <div style="margin-top: 8px; font-size: 12px; color: #9a8db3;" id="cycleHint">
+                Можно указать вручную или через 3 цикла рассчитаем автоматически
+            </div>
+        </div>
+        
         <!-- Переключатель количества месяцев -->
         <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 16px;">
             <button class="secondary-btn" style="width: auto; padding: 8px 16px;" onclick="setMonthsView(1)">1 мес</button>
@@ -665,7 +678,7 @@
         <!-- Навигация по месяцам -->
         <div class="calendar-header">
             <button onclick="changeMonth(-1)">←</button>
-            <span style="font-size: 18px; color: #c0b0ff;" id="monthYearDisplay">Февраль 2026</span>
+            <span style="font-size: 18px; color: #c0b0ff;" id="monthYearDisplay"></span>
             <button onclick="changeMonth(1)">→</button>
         </div>
         
@@ -679,18 +692,16 @@
         
         <!-- Легенда -->
         <div class="legend">
-            <div class="legend-item"><div class="legend-color" style="background: rgba(180,154,255,0.1);"></div> Обычный</div>
-            <div class="legend-item"><div class="legend-color" style="background: #ff69b4;"></div> Менструация</div>
-            <div class="legend-item"><div class="legend-color" style="background: rgba(255,105,180,0.5);"></div> Прогноз</div>
-            <div class="legend-item"><div class="legend-color" style="background: #b49aff;"></div> Овуляция</div>
-            <div class="legend-item"><div class="legend-color" style="background: rgba(180,154,255,0.5);"></div> ПМС</div>
+            <div class="legend-item"><div class="legend-color" style="background: #87CEEB;"></div> ПМС 🌪</div>
+            <div class="legend-item"><div class="legend-color" style="background: #FFB6C1;"></div> Менструация</div>
+            <div class="legend-item"><div class="legend-color" style="background: #FFC0CB;"></div> Прогноз</div>
+            <div class="legend-item"><div class="legend-color" style="background: #E6E6FA;"></div> Овуляция 💗</div>
+            <div class="legend-item"><div class="legend-color" style="background: #FFFFE0;"></div> Сегодня ✨</div>
         </div>
         
         <!-- Статистика -->
         <div class="stats-card">
             <h3 style="margin-top: 0;">📊 Статистика</h3>
-            <div class="stats-row"><span>Средняя длина цикла:</span> <span id="avgCycleLength">—</span></div>
-            <div class="stats-row"><span>Регулярность:</span> <span id="regularity">—</span></div>
             <div class="stats-row"><span>Отмечено циклов:</span> <span id="cyclesCount">0</span></div>
             <div class="stats-row"><span>Последняя менструация:</span> <span id="lastPeriod">—</span></div>
         </div>
@@ -1045,7 +1056,7 @@
     let currentDate = new Date();
     let currentMonth = currentDate.getMonth();
     let currentYear = currentDate.getFullYear();
-    let monthsView = 12; // по умолчанию показываем 12 месяцев
+    let monthsView = 1; // по умолчанию показываем 1 месяц
     
     let cycleData = JSON.parse(localStorage.getItem('cycleData')) || { periods: [] };
     
@@ -1056,7 +1067,13 @@
             btn.style.background = 'transparent';
             btn.style.color = '#b49aff';
         });
-        if (months === 12) {
+        if (months === 1) {
+            document.querySelector('[onclick="setMonthsView(1)"]').style.background = '#b49aff';
+            document.querySelector('[onclick="setMonthsView(1)"]').style.color = 'white';
+        } else if (months === 3) {
+            document.querySelector('[onclick="setMonthsView(3)"]').style.background = '#b49aff';
+            document.querySelector('[onclick="setMonthsView(3)"]').style.color = 'white';
+        } else if (months === 12) {
             document.getElementById('months12Btn').style.background = '#b49aff';
             document.getElementById('months12Btn').style.color = 'white';
         }
@@ -1066,157 +1083,122 @@
     function renderCalendar() {
         const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
         
-        // Показываем диапазон месяцев
-        let endMonth = currentMonth + (monthsView - 1);
-        let endYear = currentYear;
-        while (endMonth > 11) {
-            endMonth -= 12;
-            endYear++;
-        }
+        // Показываем текущий месяц
+        document.getElementById('monthYearDisplay').innerText = monthNames[currentMonth] + ' ' + currentYear;
         
-        let displayText = monthNames[currentMonth] + ' ' + currentYear;
-        if (monthsView > 1) {
-            displayText += ' — ' + monthNames[endMonth] + ' ' + endYear;
-        }
-        document.getElementById('monthYearDisplay').innerText = displayText;
+        const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
         
-        // Отрисовываем сетку для всех месяцев
+        let startOffset = firstDay === 0 ? 6 : firstDay - 1;
+        
         let gridHtml = '';
-        let totalDays = 0;
         
-        for (let m = 0; m < monthsView; m++) {
-            let month = currentMonth + m;
-            let year = currentYear;
-            while (month > 11) {
-                month -= 12;
-                year++;
-            }
+        // Пустые ячейки для выравнивания
+        for (let i = 0; i < startOffset; i++) {
+            gridHtml += `<div class="calendar-day" style="background: transparent;"></div>`;
+        }
+        
+        // Получаем длину цикла (из ручного ввода или автоматически)
+        let avgCycle = parseInt(document.getElementById('manualCycleLength')?.value || '28');
+        
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dateStr = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+            const isPeriod = cycleData.periods.includes(dateStr);
             
-            const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            // Прогноз
+            let isPredictedPeriod = false;
+            let isPredictedOvulation = false;
+            let isPMS = false;
             
-            let startOffset = firstDay === 0 ? 6 : firstDay - 1;
-            
-            // Добавляем пустые ячейки для первого месяца
-            if (m === 0) {
-                for (let i = 0; i < startOffset; i++) {
-                    gridHtml += `<div class="calendar-day" style="visibility: hidden;"></div>`;
-                }
-            }
-            
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-                const isPeriod = cycleData.periods.includes(dateStr);
+            if (cycleData.periods.length > 0) {
+                const lastPeriod = new Date(cycleData.periods[cycleData.periods.length - 1]);
                 
-                // Прогноз на основе последнего цикла
-                let isPredictedPeriod = false;
-                let isPredictedOvulation = false;
-                let isPMS = false;
-                
-                if (cycleData.periods.length > 0) {
-                    const lastPeriod = new Date(cycleData.periods[cycleData.periods.length - 1]);
-                    const avgCycle = calculateAvgCycle();
+                // Рассчитываем прогноз на несколько циклов вперёд
+                for (let cycle = 0; cycle < 3; cycle++) {
+                    const predictedDate = new Date(lastPeriod);
+                    predictedDate.setDate(lastPeriod.getDate() + (avgCycle * cycle));
                     
-                    if (avgCycle > 0) {
-                        // Рассчитываем прогноз на несколько циклов вперёд
-                        for (let cycle = 0; cycle < 3; cycle++) {
-                            const predictedDate = new Date(lastPeriod);
-                            predictedDate.setDate(lastPeriod.getDate() + (avgCycle * cycle));
-                            
-                            // Проверяем менструацию (±2 дня)
-                            const predictedStart = new Date(predictedDate);
-                            const predictedEnd = new Date(predictedDate);
-                            predictedEnd.setDate(predictedEnd.getDate() + 5);
-                            
-                            if (dateStr >= predictedStart.toISOString().split('T')[0] && 
-                                dateStr <= predictedEnd.toISOString().split('T')[0]) {
-                                isPredictedPeriod = true;
-                            }
-                            
-                            // Овуляция за 14 дней до следующей менструации
-                            const ovulationDate = new Date(predictedDate);
-                            ovulationDate.setDate(predictedDate.getDate() - 14);
-                            if (dateStr === ovulationDate.toISOString().split('T')[0]) {
-                                isPredictedOvulation = true;
-                            }
-                            
-                            // ПМС за 3-5 дней до менструации
-                            const pmsStart = new Date(predictedDate);
-                            pmsStart.setDate(predictedDate.getDate() - 5);
-                            const pmsEnd = new Date(predictedDate);
-                            pmsEnd.setDate(predictedDate.getDate() - 1);
-                            
-                            if (dateStr >= pmsStart.toISOString().split('T')[0] && 
-                                dateStr <= pmsEnd.toISOString().split('T')[0]) {
-                                isPMS = true;
-                            }
-                        }
+                    // Проверяем менструацию (±2 дня)
+                    const predictedStart = new Date(predictedDate);
+                    predictedStart.setDate(predictedStart.getDate() - 2);
+                    const predictedEnd = new Date(predictedDate);
+                    predictedEnd.setDate(predictedEnd.getDate() + 4);
+                    
+                    if (dateStr >= predictedStart.toISOString().split('T')[0] && 
+                        dateStr <= predictedEnd.toISOString().split('T')[0]) {
+                        isPredictedPeriod = true;
+                    }
+                    
+                    // Овуляция за 14 дней до следующей менструации
+                    const ovulationDate = new Date(predictedDate);
+                    ovulationDate.setDate(predictedDate.getDate() - 14);
+                    if (dateStr === ovulationDate.toISOString().split('T')[0]) {
+                        isPredictedOvulation = true;
+                    }
+                    
+                    // ПМС за 3-5 дней до менструации
+                    const pmsStart = new Date(predictedDate);
+                    pmsStart.setDate(predictedDate.getDate() - 5);
+                    const pmsEnd = new Date(predictedDate);
+                    pmsEnd.setDate(predictedDate.getDate() - 1);
+                    
+                    if (dateStr >= pmsStart.toISOString().split('T')[0] && 
+                        dateStr <= pmsEnd.toISOString().split('T')[0]) {
+                        isPMS = true;
                     }
                 }
-                
-                let bgColor = 'rgba(180, 154, 255, 0.1)';
-                if (isPeriod) bgColor = '#ff69b4';
-                else if (isPredictedPeriod) bgColor = 'rgba(255, 105, 180, 0.5)';
-                else if (isPredictedOvulation) bgColor = '#b49aff';
-                else if (isPMS) bgColor = 'rgba(180, 154, 255, 0.5)';
-                
-                let icon = '';
-                if (isPeriod) icon = '💧';
-                else if (isPredictedOvulation) icon = '🌸';
-                else if (isPMS) icon = '🌪';
-                
-                const today = new Date().toISOString().split('T')[0];
-                if (dateStr === today) {
-                    bgColor = 'gold';
-                    icon = '✨';
-                }
-                
-                gridHtml += `
-                    <div class="calendar-day" style="background: ${bgColor};" onclick="togglePeriod('${dateStr}')">
-                        <span>${day}</span>
-                        ${icon ? `<span class="day-icon">${icon}</span>` : ''}
-                    </div>
-                `;
             }
+            
+            // Определяем цвет и иконку
+            let bgColor = 'rgba(180, 154, 255, 0.1)';
+            let icon = '';
+            
+            if (isPeriod) {
+                bgColor = '#FFB6C1'; // светло-розовый для менструации
+                icon = '🔴';
+            } else if (isPredictedPeriod) {
+                bgColor = '#FFC0CB'; // розовый для прогноза
+                icon = '🌙';
+            } else if (isPredictedOvulation) {
+                bgColor = '#E6E6FA'; // лавандовый для овуляции
+                icon = '💗';
+            } else if (isPMS) {
+                bgColor = '#87CEEB'; // небесно-голубой для ПМС
+                icon = '🌪';
+            }
+            
+            const today = new Date().toISOString().split('T')[0];
+            if (dateStr === today) {
+                bgColor = '#FFFFE0'; // бледно-желтый для сегодня
+                icon = '✨';
+            }
+            
+            gridHtml += `
+                <div class="calendar-day" style="background: ${bgColor};" onclick="togglePeriod('${dateStr}')">
+                    <span>${day}</span>
+                    ${icon ? `<span class="day-icon">${icon}</span>` : ''}
+                </div>
+            `;
         }
         
         document.getElementById('calendarGrid').innerHTML = gridHtml;
+        
+        // Обновляем подсказку по длине цикла
+        updateCycleHint();
     }
     
-    function calculateAvgCycle() {
-        if (cycleData.periods.length < 2) return 0;
-        
-        let total = 0;
-        for (let i = 1; i < cycleData.periods.length; i++) {
-            const prev = new Date(cycleData.periods[i-1]);
-            const curr = new Date(cycleData.periods[i]);
-            const diff = Math.floor((curr - prev) / (1000 * 60 * 60 * 24));
-            total += diff;
+    function updateCycleHint() {
+        const hint = document.getElementById('cycleHint');
+        if (cycleData.periods.length >= 3) {
+            hint.innerHTML = '✅ Уже есть 3 цикла! Можно рассчитать автоматически. Хотите обновить?';
+        } else {
+            hint.innerHTML = `Отмечено ${cycleData.periods.length} циклов. Нужно ещё ${3 - cycleData.periods.length} для автоматического расчёта.`;
         }
-        return Math.round(total / (cycleData.periods.length - 1));
     }
     
     function updateStats() {
-        const avgCycle = calculateAvgCycle();
-        document.getElementById('avgCycleLength').innerText = avgCycle ? avgCycle + ' дней' : '—';
-        
         const cyclesCount = cycleData.periods.length;
         document.getElementById('cyclesCount').innerText = cyclesCount;
-        
-        if (cyclesCount >= 3) {
-            let regular = true;
-            let lastCycle = 0;
-            for (let i = 1; i < cycleData.periods.length; i++) {
-                const prev = new Date(cycleData.periods[i-1]);
-                const curr = new Date(cycleData.periods[i]);
-                const diff = Math.floor((curr - prev) / (1000 * 60 * 60 * 24));
-                if (lastCycle && Math.abs(diff - lastCycle) > 5) regular = false;
-                lastCycle = diff;
-            }
-            document.getElementById('regularity').innerText = regular ? 'Стабильный' : 'Плавающий';
-        } else {
-            document.getElementById('regularity').innerText = '—';
-        }
         
         if (cycleData.periods.length > 0) {
             const last = new Date(cycleData.periods[cycleData.periods.length - 1]);
@@ -1224,6 +1206,8 @@
         } else {
             document.getElementById('lastPeriod').innerText = '—';
         }
+        
+        updateCycleHint();
     }
     
     function changeMonth(delta) {
@@ -1282,15 +1266,13 @@
             
             // Проверка прогноза
             if (cycleData.periods.length > 0) {
-                const avgCycle = calculateAvgCycle();
-                if (avgCycle > 0) {
-                    const lastPeriod = new Date(cycleData.periods[cycleData.periods.length - 1]);
-                    for (let cycle = 0; cycle < 3; cycle++) {
-                        const ovulationDate = new Date(lastPeriod);
-                        ovulationDate.setDate(lastPeriod.getDate() + (avgCycle * cycle) - 14);
-                        if (dateStr === ovulationDate.toISOString().split('T')[0]) {
-                            hasOvulation = true;
-                        }
+                const avgCycle = parseInt(document.getElementById('manualCycleLength')?.value || '28');
+                const lastPeriod = new Date(cycleData.periods[cycleData.periods.length - 1]);
+                for (let cycle = 0; cycle < 3; cycle++) {
+                    const ovulationDate = new Date(lastPeriod);
+                    ovulationDate.setDate(lastPeriod.getDate() + (avgCycle * cycle) - 14);
+                    if (dateStr === ovulationDate.toISOString().split('T')[0]) {
+                        hasOvulation = true;
                     }
                 }
             }
