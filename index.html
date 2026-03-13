@@ -309,7 +309,7 @@
         <div class="logo-full">BridgeToHer</div>
     </div>
 
-    <!-- ==================== СТРАНИЦА 1: Приветствие ==================== -->
+    <!-- СТРАНИЦА 1: Приветствие -->
     <div id="page1" style="display: block;">
         <h2>Мост к ней</h2>
         <div style="margin: 40px 0; text-align: center; line-height: 1.8;">
@@ -322,7 +322,7 @@
         <button class="secondary-btn" onclick="goToPage(5)">🌙 Сразу к настроению</button>
     </div>
 
-    <!-- ==================== СТРАНИЦА 2: Приглашение партнёра ==================== -->
+    <!-- СТРАНИЦА 2: Приглашение партнёра -->
     <div id="page2" style="display: none;">
         <button class="back-btn" onclick="goToPage(1)">← Назад</button>
         <h2>📲 Пригласить партнёра</h2>
@@ -338,7 +338,7 @@
         <button class="secondary-btn" onclick="setNoPartner()" style="border-color: #ff69b4; color: #ff69b4;">🌸 Нет парня</button>
     </div>
 
-    <!-- ==================== СТРАНИЦА 3: Чек-лист (архивируется) ==================== -->
+    <!-- СТРАНИЦА 3: Чек-лист (архивируется) -->
     <div id="page3" style="display: none;">
         <button class="back-btn" onclick="goToPage(2)">← Назад</button>
         <h2>📋 Расскажи о себе</h2>
@@ -396,7 +396,7 @@
         <button onclick="saveChecklist()">💾 Сохранить и продолжить</button>
     </div>
 
-    <!-- ==================== СТРАНИЦА 4: Календарь ==================== -->
+    <!-- СТРАНИЦА 4: Календарь -->
     <div id="page4" style="display: none;">
         <button class="back-btn" onclick="goToPage(3)">← Назад</button>
         <h2>📅 Календарь цикла</h2>
@@ -434,7 +434,7 @@
         </div>
     </div>
 
-    <!-- ==================== СТРАНИЦА 5: Настроение ==================== -->
+    <!-- СТРАНИЦА 5: Настроение -->
     <div id="page5" style="display: none;">
         <button class="back-btn" onclick="goToPage(4)">← Назад</button>
         <h2>🌸 Как ты сегодня?</h2>
@@ -456,7 +456,7 @@
         </div>
     </div>
 
-    <!-- ==================== СТРАНИЦА 6: Настройки ==================== -->
+    <!-- СТРАНИЦА 6: Настройки -->
     <div id="page6" style="display: none;">
         <button class="back-btn" onclick="goToPage(5)">← Назад</button>
         <h2>⚙️ Настройки</h2>
@@ -577,7 +577,7 @@
                 for (let upd of data.result.reverse()) {
                     if (upd.message?.text?.includes('/start')) {
                         const id = upd.message.chat.id.toString();
-                        const name = (upd.message.from.first_name || '') + ' ' + (upth.message.from.last_name || '');
+                        const name = (upd.message.from.first_name || '') + ' ' + (upd.message.from.last_name || '');
                         partnerChatId = id;
                         localStorage.setItem('partnerChatId', id);
                         localStorage.setItem('partnerName', name.trim() || 'партнёр');
