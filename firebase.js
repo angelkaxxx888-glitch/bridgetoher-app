@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getFirestore, addDoc, collection } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSy...",
+  apiKey: "AIzaSy...", // замени на свои
   authDomain: "bridgetoher.firebaseapp.com",
   projectId: "bridgetoher",
   storageBucket: "bridgetoher.firebasestorage.app",
