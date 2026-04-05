@@ -789,7 +789,9 @@
         }
         const moodText = activeMood.innerText;
         const note = document.getElementById('dailyNote').value;
-        alert(`Отправлено: ${moodText}\n${note ? 'Заметка: ' + note : ''}\n\n(пока тестовая версия)`);
+        await saveMood(moodText, note);
+
+alert("Сохранено в Firebase 🔥");
         // Здесь потом добавим реальную отправку
     });
 
