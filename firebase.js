@@ -1,8 +1,8 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, addDoc, collection } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDZkrtOXISbUO3Fb_zvsyzzH1aS4ee8ZTI",
+  apiKey: "AIzaSy...",
   authDomain: "bridgetoher.firebaseapp.com",
   projectId: "bridgetoher",
   storageBucket: "bridgetoher.firebasestorage.app",
@@ -12,3 +12,11 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
+
+export async function saveMood(mood, note) {
+  await addDoc(collection(db, "moods"), {
+    mood: mood,
+    note: note,
+    createdAt: new Date()
+  });
+}
