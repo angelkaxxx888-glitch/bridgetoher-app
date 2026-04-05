@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BridgeToHer — для партнёра</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63);
+            color: #e0e0ff;
+            font-family: system-ui;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 16px;
+        }
+        .card {
+            max-width: 400px;
+            background: rgba(30,30,60,0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 40px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+        .mood {
+            font-size: 80px;
+            margin: 20px 0;
+        }
+        .note {
+            background: rgba(180,154,255,0.2);
+            border-radius: 24px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+        .update-time {
+            font-size: 12px;
+            margin-top: 16px;
+            color: #9a8db3;
+        }
+        .hint {
+            background: rgba(255,105,180,0.2);
+            padding: 12px;
+            border-radius: 20px;
+            margin-top: 16px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2>🌉 Мост к ней</h2>
+    <div class="mood" id="moodDisplay">😌</div>
+    <div class="note" id="noteDisplay">Ещё нет заметок...</div>
+    <div class="hint" id="hintDisplay">💡 Сегодня она будет рада твоему вниманию</div>
+    <div class="update-time" id="timeDisplay"></div>
+</div>
+<script type="module">
+    import { getLastMood, getPhaseHint } from './firebase.js';
+    
+    async function update() {
+        const last = await getLastMood();
+        if (last) {
+            document.getElementById('moodDisplay').innerText = last.mood || '😌';
+            document.getElementById('noteDisplay').innerHTML = last.note ? `💬 ${last.note}` : 'Без заметки';
+            const date = new Date(last.createdAt?.toDate?.() || last.createdAt);
+            document.getElementById('timeDisplay').innerText = `Обновлено: ${date.toLocaleString('ru-RU')}`;
+            
+            // Показываем подсказку на основе настроения
+            const hint = getPhaseHint(last.mood);
+            document.getElementById('hintDisplay').innerHTML = hint;
+        }
+        setTimeout(update, 5000);
+    }
+    update();
+</script>
+</body>
+</html>
