@@ -541,7 +541,9 @@
     <div class="footer">BTH · BridgeToHer · мост к ней</div>
 </div>
 
-<script>
+<script type="module">
+    import { saveMood } from './firebase.js';
+    
     const PROXY_URL = 'https://hervibe-proxy.onrender.com';
     const BOT_LINK = 'https://t.me/BridgeToHer_bot';
 
@@ -655,14 +657,12 @@
             const isPeriod = cycleData.periods.includes(dateStr);
             const isOvulation = cycleData.ovulations.includes(dateStr);
 
-            // === ПРОГНОЗ НА ОСНОВЕ ПОСЛЕДНЕЙ МЕНСТРУАЦИИ ===
             let isPredictedPeriod = false;
             
             if (cycleData.periods.length > 0) {
                 const lastPeriodFirstDay = cycleData.periods[cycleData.periods.length - 1];
                 const lastDate = new Date(lastPeriodFirstDay);
                 
-                // Строим прогноз на 12 циклов вперёд
                 for (let cycle = 1; cycle <= 12; cycle++) {
                     const predictedStart = new Date(lastDate);
                     predictedStart.setDate(lastDate.getDate() + (cycleLength * cycle));
@@ -712,11 +712,9 @@
         const action = confirm('📅 Отметить как первый день менструации?');
         
         if (action === true) {
-            // Добавляем первый день
             cycleData.periods.push(dateStr);
             cycleData.periods.sort();
             
-            // Автоматически добавляем следующие дни (длительность из настроек)
             const periodLength = cycleData.periodLength || 5;
             const selectedDate = new Date(dateStr);
             
@@ -731,7 +729,6 @@
             }
             cycleData.periods.sort();
             
-            // Сохраняем и перерисовываем
             localStorage.setItem('cycleData', JSON.stringify(cycleData));
             renderCalendar();
             
@@ -789,15 +786,17 @@
         }
         const moodText = activeMood.innerText;
         const note = document.getElementById('dailyNote').value;
-        await saveMood(moodText, note);
-
-alert("Сохранено в Firebase 🔥");
-        // Здесь потом добавим реальную отправку
+        
+        try {
+            await saveMood(moodText, note);
+            alert("✅ Сохранено в Firebase! Партнёр увидит на своей странице.");
+        } catch (e) {
+            console.error("Ошибка сохранения:", e);
+            alert("❌ Ошибка сохранения. Проверь консоль.");
+        }
     });
 
     goToPage(1);
 </script>
-    <script type="module">
-import { saveMood } from "./firebase.js";
 </body>
 </html>
