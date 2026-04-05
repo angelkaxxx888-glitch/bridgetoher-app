@@ -2,102 +2,268 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>BridgeToHer — тест</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BridgeToHer</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
+        
         body {
             background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            color: white;
-            font-family: system-ui;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 16px;
+            color: #e0e0ff;
         }
+        
         .app {
-            max-width: 400px;
-            background: rgba(30,30,60,0.85);
+            max-width: 420px;
+            width: 100%;
+            background: rgba(30, 30, 60, 0.85);
+            backdrop-filter: blur(10px);
             border-radius: 40px;
-            padding: 24px;
+            padding: 24px 20px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(180, 154, 255, 0.2);
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .logo-bth {
+            font-size: 48px;
+            font-weight: 800;
+            color: #b49aff;
+            letter-spacing: 4px;
+            text-shadow: 0 0 30px rgba(180, 154, 255, 0.7);
+            margin-bottom: 8px;
+        }
+        .logo-full {
+            font-size: 18px;
+            color: #c0b0ff;
+            letter-spacing: 2px;
+            opacity: 0.9;
+        }
+        
+        h2 {
+            font-size: 24px;
+            color: #b49aff;
+            margin-bottom: 20px;
             text-align: center;
         }
+        
         button {
-            background: #b49aff;
+            width: 100%;
+            padding: 16px 20px;
             border: none;
-            padding: 16px;
             border-radius: 40px;
             font-size: 16px;
-            color: white;
-            width: 100%;
-            margin: 8px 0;
+            font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s;
+            margin: 8px 0;
+            background: linear-gradient(135deg, #b49aff, #9a7fff);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(180, 154, 255, 0.4);
         }
         .secondary-btn {
             background: transparent;
             border: 1px solid #b49aff;
+            color: #b49aff;
         }
-        .page { display: none; }
-        .page.active { display: block; }
+        
+        .back-btn {
+            background: transparent;
+            border: none;
+            color: #9a8db3;
+            font-size: 14px;
+            text-align: left;
+            padding: 8px 0;
+            display: inline-block;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .nav-buttons button {
+            flex: 1;
+            margin: 0;
+        }
+        .forward-btn {
+            background: linear-gradient(135deg, #b49aff, #7b68ae);
+        }
+        
+        .mood-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .mood-btn {
+            background: rgba(180, 154, 255, 0.15);
+            border: 1px solid rgba(180, 154, 255, 0.3);
+            border-radius: 20px;
+            padding: 16px 8px;
+            font-size: 15px;
+            color: #e0e0ff;
+            cursor: pointer;
+            text-align: center;
+        }
+        .mood-btn.active {
+            background: #b49aff;
+            color: white;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 16px;
+            border: 1px solid rgba(180, 154, 255, 0.3);
+            border-radius: 24px;
+            background: rgba(30, 30, 60, 0.6);
+            color: white;
+            font-size: 15px;
+            margin: 16px 0;
+            resize: vertical;
+        }
+        
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+        
+        .footer {
+            text-align: center;
+            color: #9a8db3;
+            font-size: 12px;
+            margin-top: 24px;
+        }
     </style>
 </head>
 <body>
 <div class="app">
-    <div class="logo-bth" style="font-size:48px;">BTH</div>
-    <div class="logo-full">BridgeToHer</div>
+    <div class="logo">
+        <div class="logo-bth">BTH</div>
+        <div class="logo-full">BridgeToHer</div>
+    </div>
 
-    <!-- Страница 1 -->
+    <!-- СТРАНИЦА 1: Приветствие -->
     <div id="page1" class="page active">
         <h2>Мост к ней</h2>
-        <p>Привет. Это приложение — мост между твоим настроением и его пониманием.</p>
-        <p>🌸 Если нет партнёра — я поддержу тебя сам 🌸</p>
+        <div style="margin: 40px 0; text-align: center; line-height: 1.8;">
+            <p>Привет.</p>
+            <p style="margin: 20px 0;">Это приложение — мост между твоим настроением и его пониманием.</p>
+            <p>Ответь на несколько вопросов — и он будет знать, как тебя поддержать.</p>
+            <p style="margin-top: 20px; color: #b49aff; font-size: 18px;">🌸 Если нет партнёра — я поддержу тебя сам 🌸</p>
+        </div>
         <button onclick="goToPage(2)">✨ Начать</button>
         <button class="secondary-btn" onclick="goToPage(5)">🌙 Сразу к настроению</button>
     </div>
 
-    <!-- Страница 2 (заглушка) -->
+    <!-- СТРАНИЦА 2: Приглашение партнёра (упрощённая) -->
     <div id="page2" class="page">
-        <button class="secondary-btn" onclick="goToPage(1)">← Назад</button>
+        <button class="back-btn" onclick="goToPage(1)">← Назад</button>
         <h2>📲 Пригласить партнёра</h2>
-        <button onclick="alert('Бот временно отключён')">📱 Открыть бота</button>
-        <button onclick="goToPage(3)">⏰ Позже</button>
-        <button onclick="goToPage(3)">Вперёд →</button>
+        <div style="margin: 20px 0;">
+            <button onclick="window.open('https://t.me/BridgeToHer_bot', '_blank')">📱 Открыть бота</button>
+            <button class="secondary-btn" onclick="alert('Проверка подключения (тест)')">🔍 Проверить подключение</button>
+        </div>
+        <div class="nav-buttons">
+            <button class="secondary-btn" onclick="goToPage(3)">⏰ Позже</button>
+            <button class="forward-btn" onclick="goToPage(3)">Вперёд →</button>
+        </div>
+        <button class="secondary-btn" onclick="goToPage(3)" style="border-color: #ff69b4; color: #ff69b4;">🌸 Нет парня</button>
     </div>
 
-    <!-- Страница 3 (заглушка) -->
+    <!-- СТРАНИЦА 3: Чек-лист (упрощённый) -->
     <div id="page3" class="page">
-        <button class="secondary-btn" onclick="goToPage(2)">← Назад</button>
+        <button class="back-btn" onclick="goToPage(2)">← Назад</button>
         <h2>📋 Расскажи о себе</h2>
+        <p style="color: #9a8db3; margin-bottom: 16px;">Выбери фазу и отметь, что испытываешь чаще всего</p>
+        <div class="phase-tabs" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
+            <span style="padding: 8px 16px; background: #b49aff; border-radius: 40px;">🌧 ПМС</span>
+        </div>
+        <div class="question" style="background: rgba(50,50,80,0.6); border-radius: 20px; padding: 16px; margin: 16px 0;">
+            <div class="q-title" style="margin-bottom: 12px;">Что ты чаще всего испытываешь?</div>
+            <div class="option"><input type="checkbox"> 😠 раздражительность</div>
+            <div class="option"><input type="checkbox"> 😭 плаксивость</div>
+            <div class="option"><input type="checkbox"> 🍰 тяга к сладкому</div>
+        </div>
         <button onclick="goToPage(4)">💾 Сохранить и продолжить</button>
     </div>
 
-    <!-- Страница 4 (заглушка) -->
+    <!-- СТРАНИЦА 4: Календарь (упрощённый) -->
     <div id="page4" class="page">
-        <button class="secondary-btn" onclick="goToPage(3)">← Назад</button>
+        <button class="back-btn" onclick="goToPage(3)">← Назад</button>
         <h2>📅 Календарь цикла</h2>
-        <button onclick="goToPage(5)">Вперёд →</button>
-    </div>
-
-    <!-- Страница 5 (главная) -->
-    <div id="page5" class="page">
-        <button class="secondary-btn" onclick="goToPage(4)">← Календарь</button>
-        <h2>🌸 Как ты сегодня?</h2>
-        <div class="mood-buttons" style="display: flex; flex-wrap: wrap; gap: 8px;">
-            <button class="mood-btn" data-mood="calm">😌 спокойно</button>
-            <button class="mood-btn" data-mood="tender">🥰 нежность</button>
-            <button class="mood-btn" data-mood="joy">😊 радость</button>
-            <button class="mood-btn" data-mood="tired">😴 усталость</button>
+        <div style="margin: 20px 0; text-align: center;">
+            <div style="display: inline-block; padding: 10px;">📅 Март 2026</div>
         </div>
-        <textarea id="dailyNote" placeholder="Заметка..." style="width:100%; margin:8px 0; padding:8px;"></textarea>
-        <button id="sendDailyBtn">💌 Отправить</button>
-        <button class="secondary-btn" onclick="goToPage(6)">⚙️ Настройки</button>
+        <div class="nav-buttons">
+            <button class="secondary-btn" onclick="goToPage(3)">← Назад</button>
+            <button class="forward-btn" onclick="goToPage(5)">Вперёд →</button>
+        </div>
     </div>
 
-    <!-- Страница 6 (заглушка) -->
-    <div id="page6" class="page">
-        <button class="secondary-btn" onclick="goToPage(5)">← Назад</button>
-        <h2>⚙️ Настройки</h2>
-        <button onclick="alert('Настройки сохранены')">💾 Сохранить</button>
+    <!-- СТРАНИЦА 5: Настроение (ГЛАВНЫЙ ЭКРАН) -->
+    <div id="page5" class="page">
+        <button class="back-btn" onclick="goToPage(4)">← Календарь</button>
+        <h2>🌸 Как ты сегодня?</h2>
+        
+        <div style="background: rgba(180, 154, 255, 0.15); border-radius: 20px; padding: 12px; margin-bottom: 16px; text-align: center;">
+            <span style="color: #c0b0ff;">🔔 Настрой частоту уведомлений, чтобы я их отправлял твоему партнёру или напрямую тебе</span>
+        </div>
+        
+        <div class="mood-buttons">
+            <div class="mood-btn" data-mood="calm">😌 спокойно</div>
+            <div class="mood-btn" data-mood="tender">🥰 нежность</div>
+            <div class="mood-btn" data-mood="joy">😊 радость</div>
+            <div class="mood-btn" data-mood="passion">🔥 страсть</div>
+            <div class="mood-btn" data-mood="tired">😴 усталость</div>
+            <div class="mood-btn" data-mood="irritated">😠 раздражение</div>
+            <div class="mood-btn" data-mood="sad">😭 грусть</div>
+            <div class="mood-btn" data-mood="sick">🤢 тошнота</div>
+        </div>
+        <textarea id="dailyNote" placeholder="Заметка..."></textarea>
+        <button id="sendDailyBtn">💌 Отправить</button>
+        <div class="nav-buttons">
+            <button class="secondary-btn" onclick="goToPage(4)">📅 Календарь</button>
+            <button class="secondary-btn" onclick="goToPage(6)">⚙️ Настройки</button>
+        </div>
     </div>
+
+    <!-- СТРАНИЦА 6: Настройки (упрощённые) -->
+    <div id="page6" class="page">
+        <button class="back-btn" onclick="goToPage(5)">← Назад</button>
+        <h2>⚙️ Настройки</h2>
+        <div class="settings-group" style="margin: 24px 0;">
+            <h3>🔔 Уведомления для меня</h3>
+            <div style="margin: 12px 0;">
+                <span>Напоминания: Каждый день</span>
+            </div>
+        </div>
+        <button onclick="alert('Настройки сохранены (тест)')">💾 Сохранить настройки</button>
+        <div class="nav-buttons">
+            <button class="secondary-btn" onclick="goToPage(5)">← Назад</button>
+        </div>
+    </div>
+
+    <div class="footer">BTH · BridgeToHer · мост к ней</div>
 </div>
 
 <script>
@@ -113,17 +279,17 @@
             this.classList.add('active');
         });
     });
-
+    
     // Отправка
     document.getElementById('sendDailyBtn').addEventListener('click', function() {
-        const active = document.querySelector('.mood-btn.active');
-        if (!active) {
-            alert('Выбери настроение ❤️');
+        const activeMood = document.querySelector('.mood-btn.active');
+        if (!activeMood) {
+            alert('Выбери своё настроение ❤️');
             return;
         }
-        const mood = active.innerText;
+        const moodText = activeMood.innerText;
         const note = document.getElementById('dailyNote').value;
-        alert(`Отправлено: ${mood}\n${note ? 'Заметка: ' + note : ''}`);
+        alert(`Отправлено: ${moodText}\n${note ? 'Заметка: ' + note : ''}`);
     });
 </script>
 </body>
