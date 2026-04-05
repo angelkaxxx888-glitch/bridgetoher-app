@@ -316,7 +316,7 @@
             <p>Привет.</p>
             <p style="margin: 20px 0;">Это приложение — мост между твоим настроением и его пониманием.</p>
             <p>Ответь на несколько вопросов — и он будет знать, как тебя поддержать.</p>
-            <p style="margin-top: 20px; color: #b49aff; font-size: 20px;">я поддержу тебя сам ❤️</p>
+            <p style="margin-top: 20px; color: #b49aff; font-size: 18px;">🌸 Если нет партнёра — я поддержу тебя сам 🌸</p>
         </div>
         <button onclick="goToPage(2)">✨ Начать</button>
         <button class="secondary-btn" onclick="goToPage(5)">🌙 Сразу к настроению</button>
@@ -351,6 +351,8 @@
             <div class="phase-tab" data-phase="follic">🌱 Фолликулярная</div>
         </div>
         <div class="phase-sub" id="phaseSub">(за 3–7 дней до менструации)</div>
+        
+        <!-- ПМС -->
         <div id="phase-pms" class="phase-content active">
             <div class="question">
                 <div class="q-title">Что ты чаще всего испытываешь?</div>
@@ -358,8 +360,14 @@
                 <div class="option"><input type="checkbox" class="pms"> 😭 плаксивость</div>
                 <div class="option"><input type="checkbox" class="pms"> 🍰 тяга к сладкому</div>
                 <div class="option"><input type="checkbox" class="pms"> 💔 тяжесть в груди</div>
+                <div class="option"><input type="checkbox" class="pms"> 😫 усталость без сил</div>
+                <div class="option"><input type="checkbox" class="pms"> 🤯 всё бесит и выводит из себя</div>
+                <div class="option"><input type="checkbox" class="pms"> 🛌 хочется спать днём</div>
+                <div class="option"><input type="checkbox" class="pms"> 🤗 хочется, чтобы просто обняли</div>
             </div>
         </div>
+        
+        <!-- Менструация -->
         <div id="phase-mens" class="phase-content">
             <div class="question">
                 <div class="q-title">Что ты чаще всего испытываешь?</div>
@@ -367,32 +375,58 @@
                 <div class="option"><input type="checkbox" class="mens"> 😣 терпимо</div>
                 <div class="option"><input type="checkbox" class="mens"> 🛏 хочется лежать</div>
                 <div class="option"><input type="checkbox" class="mens"> 🌡 помогает грелка</div>
+                <div class="option"><input type="checkbox" class="mens"> 🤢 тошнота / слабость</div>
+                <div class="option"><input type="checkbox" class="mens"> 😭 плаксивое настроение</div>
+                <div class="option"><input type="checkbox" class="mens"> 🍫 хочется шоколада</div>
+                <div class="option"><input type="checkbox" class="mens"> 🫂 нужна поддержка</div>
             </div>
         </div>
+        
+        <!-- Овуляция -->
         <div id="phase-ovul" class="phase-content">
             <div class="question">
                 <div class="q-title">Что ты чаще всего испытываешь?</div>
                 <div class="option"><input type="checkbox" class="ovul"> 🔥 прилив энергии</div>
                 <div class="option"><input type="checkbox" class="ovul"> 💃 романтический настрой</div>
                 <div class="option"><input type="checkbox" class="ovul"> 🌸 чувствую себя красивой</div>
+                <div class="option"><input type="checkbox" class="ovul"> 💋 повышено либидо</div>
+                <div class="option"><input type="checkbox" class="ovul"> ✨ хочется перемен</div>
+                <div class="option"><input type="checkbox" class="ovul"> 💬 много говорю, хочется общения</div>
+                <div class="option"><input type="checkbox" class="ovul"> 🎨 тянет творить / делать красоту</div>
+                <div class="option"><input type="checkbox" class="ovul"> 🥰 особенно нежная</div>
             </div>
         </div>
+        
+        <!-- Лютеиновая -->
         <div id="phase-luteal" class="phase-content">
             <div class="question">
                 <div class="q-title">Что ты чаще всего испытываешь?</div>
                 <div class="option"><input type="checkbox" class="luteal"> 😌 спокойствие</div>
                 <div class="option"><input type="checkbox" class="luteal"> 😴 усталость</div>
                 <div class="option"><input type="checkbox" class="luteal"> 🤗 хочется заботы</div>
+                <div class="option"><input type="checkbox" class="luteal"> 🍚 аппетит повышается</div>
+                <div class="option"><input type="checkbox" class="luteal"> 💧 чувствительная грудь</div>
+                <div class="option"><input type="checkbox" class="luteal"> 🤫 хочется побыть одной</div>
+                <div class="option"><input type="checkbox" class="luteal"> 😐 всё равно / никак</div>
+                <div class="option"><input type="checkbox" class="luteal"> 📚 хочется читать / быть дома</div>
             </div>
         </div>
+        
+        <!-- Фолликулярная -->
         <div id="phase-follic" class="phase-content">
             <div class="question">
                 <div class="q-title">Что ты чаще всего испытываешь?</div>
                 <div class="option"><input type="checkbox" class="follic"> ⚡ много энергии</div>
                 <div class="option"><input type="checkbox" class="follic"> 😊 приподнятое настроение</div>
                 <div class="option"><input type="checkbox" class="follic"> 🎨 хочется творить</div>
+                <div class="option"><input type="checkbox" class="follic"> 💪 силы вернулись</div>
+                <div class="option"><input type="checkbox" class="follic"> 👗 хочется выглядеть красиво</div>
+                <div class="option"><input type="checkbox" class="follic"> 🤝 легко на контакт</div>
+                <div class="option"><input type="checkbox" class="follic"> 🌿 спокойствие и радость</div>
+                <div class="option"><input type="checkbox" class="follic"> 🏃 тянет к движению / спорту</div>
             </div>
         </div>
+        
         <button onclick="saveChecklist()">💾 Сохранить и продолжить</button>
     </div>
 
@@ -434,10 +468,15 @@
         </div>
     </div>
 
-    <!-- СТРАНИЦА 5: Настроение -->
+    <!-- СТРАНИЦА 5: Настроение (ГЛАВНЫЙ ЭКРАН) -->
     <div id="page5" style="display: none;">
-        <button class="back-btn" onclick="goToPage(4)">← Назад</button>
+        <button class="back-btn" onclick="goToPage(4)">← Календарь</button>
         <h2>🌸 Как ты сегодня?</h2>
+        
+        <div style="background: rgba(180, 154, 255, 0.15); border-radius: 20px; padding: 12px; margin-bottom: 16px; text-align: center;">
+            <span style="color: #c0b0ff;">🔔 Настрой частоту уведомлений, чтобы я их отправлял твоему партнёру или напрямую тебе</span>
+        </div>
+        
         <div class="mood-buttons">
             <div class="mood-btn" data-mood="calm">😌 спокойно</div>
             <div class="mood-btn" data-mood="tender">🥰 нежность</div>
@@ -554,7 +593,7 @@
     function saveChecklist() {
         checklistCompleted = true;
         localStorage.setItem('checklistCompleted', 'true');
-        goToPage(4);
+        goToPage(5);
     }
 
     function editChecklist() {
@@ -604,7 +643,9 @@
         let startOffset = firstDay === 0 ? 6 : firstDay - 1;
         let html = '';
 
-        for (let i = 0; i < startOffset; i++) html += `<div class="calendar-day" style="background:transparent;"></div>`;
+        for (let i = 0; i < startOffset; i++) {
+            html += `<div class="calendar-day" style="background:transparent;"></div>`;
+        }
 
         const cycleLength = cycleData.cycleLength || 28;
         const periodLength = cycleData.periodLength || 5;
@@ -614,46 +655,97 @@
             const isPeriod = cycleData.periods.includes(dateStr);
             const isOvulation = cycleData.ovulations.includes(dateStr);
 
+            // === ПРОГНОЗ НА ОСНОВЕ ПОСЛЕДНЕЙ МЕНСТРУАЦИИ ===
             let isPredictedPeriod = false;
+            
             if (cycleData.periods.length > 0) {
-                const lastPeriod = new Date(cycleData.periods[cycleData.periods.length - 1]);
-                for (let cycle = 1; cycle <= 6; cycle++) {
-                    const start = new Date(lastPeriod);
-                    start.setDate(lastPeriod.getDate() + (cycleLength * cycle));
+                const lastPeriodFirstDay = cycleData.periods[cycleData.periods.length - 1];
+                const lastDate = new Date(lastPeriodFirstDay);
+                
+                // Строим прогноз на 12 циклов вперёд
+                for (let cycle = 1; cycle <= 12; cycle++) {
+                    const predictedStart = new Date(lastDate);
+                    predictedStart.setDate(lastDate.getDate() + (cycleLength * cycle));
+                    
                     for (let day = 0; day < periodLength; day++) {
-                        const pred = new Date(start);
-                        pred.setDate(start.getDate() + day);
-                        if (dateStr === pred.toISOString().split('T')[0]) isPredictedPeriod = true;
+                        const predDate = new Date(predictedStart);
+                        predDate.setDate(predictedStart.getDate() + day);
+                        const predStr = predDate.toISOString().split('T')[0];
+                        
+                        if (dateStr === predStr) {
+                            isPredictedPeriod = true;
+                        }
                     }
                 }
             }
 
             let bg = 'rgba(180, 154, 255, 0.1)';
             let icon = '';
-            if (isPeriod) { bg = '#FF2400'; icon = '🔴'; }
-            else if (isOvulation) { bg = '#E6E6FA'; icon = '💗'; }
-            else if (isPredictedPeriod) { bg = '#FFB6C1'; icon = '🌸'; }
+            
+            if (isPeriod) {
+                bg = '#FF2400';
+                icon = '🔴';
+            } else if (isOvulation) {
+                bg = '#E6E6FA';
+                icon = '💗';
+            } else if (isPredictedPeriod) {
+                bg = '#FFB6C1';
+                icon = '🌸';
+            }
 
             const today = new Date().toISOString().split('T')[0];
-            if (dateStr === today) { bg = '#FFFFE0'; icon = '✨'; }
+            if (dateStr === today) {
+                bg = '#FFFFE0';
+                icon = '✨';
+            }
 
-            html += `<div class="calendar-day" style="background:${bg};" onclick="openDayMenu('${dateStr}')"><span>${d}</span>${icon ? `<span class="day-icon">${icon}</span>` : ''}</div>`;
+            html += `<div class="calendar-day" style="background:${bg};" onclick="openDayMenu('${dateStr}')">
+                        <span>${d}</span>
+                        ${icon ? `<span class="day-icon">${icon}</span>` : ''}
+                     </div>`;
         }
+        
         document.getElementById('calendarGrid').innerHTML = html;
     }
 
     function openDayMenu(dateStr) {
-        const action = prompt('Выбери: 1 — менструация, 2 — овуляция');
-        if (action === '1') {
+        const action = confirm('📅 Отметить как первый день менструации?');
+        
+        if (action === true) {
+            // Добавляем первый день
             cycleData.periods.push(dateStr);
             cycleData.periods.sort();
+            
+            // Автоматически добавляем следующие дни (длительность из настроек)
+            const periodLength = cycleData.periodLength || 5;
+            const selectedDate = new Date(dateStr);
+            
+            for (let i = 1; i < periodLength; i++) {
+                const nextDay = new Date(selectedDate);
+                nextDay.setDate(selectedDate.getDate() + i);
+                const nextDayStr = nextDay.toISOString().split('T')[0];
+                
+                if (!cycleData.periods.includes(nextDayStr)) {
+                    cycleData.periods.push(nextDayStr);
+                }
+            }
+            cycleData.periods.sort();
+            
+            // Сохраняем и перерисовываем
             localStorage.setItem('cycleData', JSON.stringify(cycleData));
             renderCalendar();
-        } else if (action === '2') {
-            cycleData.ovulations.push(dateStr);
-            cycleData.ovulations.sort();
-            localStorage.setItem('cycleData', JSON.stringify(cycleData));
-            renderCalendar();
+            
+            alert(`✅ Отмечена менструация с ${dateStr} (${periodLength} дн.)`);
+            
+        } else {
+            const ovulAction = confirm('🌸 Отметить как день овуляции?');
+            if (ovulAction) {
+                cycleData.ovulations.push(dateStr);
+                cycleData.ovulations.sort();
+                localStorage.setItem('cycleData', JSON.stringify(cycleData));
+                renderCalendar();
+                alert(`✅ Отмечена овуляция ${dateStr}`);
+            }
         }
     }
 
@@ -680,6 +772,26 @@
         localStorage.setItem('partnerName', document.getElementById('partnerName').value);
         alert('Настройки сохранены');
     }
+
+    // ==================== КНОПКИ НАСТРОЕНИЯ ====================
+    document.querySelectorAll('.mood-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+    
+    document.getElementById('sendDailyBtn').addEventListener('click', function() {
+        const activeMood = document.querySelector('.mood-btn.active');
+        if (!activeMood) {
+            alert('Выбери своё настроение ❤️');
+            return;
+        }
+        const moodText = activeMood.innerText;
+        const note = document.getElementById('dailyNote').value;
+        alert(`Отправлено: ${moodText}\n${note ? 'Заметка: ' + note : ''}\n\n(пока тестовая версия)`);
+        // Здесь потом добавим реальную отправку
+    });
 
     goToPage(1);
 </script>
