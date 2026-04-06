@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BridgeToHer</title>
+    <title>BridgeToHer · полная версия</title>
     <style>
         * {
             margin: 0;
@@ -58,6 +58,11 @@
             margin-bottom: 20px;
             text-align: center;
         }
+        h3 {
+            font-size: 18px;
+            color: #c0b0ff;
+            margin: 24px 0 12px;
+        }
         
         button {
             width: 100%;
@@ -106,6 +111,72 @@
             background: linear-gradient(135deg, #b49aff, #7b68ae);
         }
         
+        .phase-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            border-bottom: 1px solid rgba(180, 154, 255, 0.2);
+            padding-bottom: 12px;
+        }
+        .phase-tab {
+            padding: 8px 16px;
+            border-radius: 40px;
+            background: rgba(180, 154, 255, 0.1);
+            border: 1px solid rgba(180, 154, 255, 0.2);
+            font-size: 14px;
+            cursor: pointer;
+            color: #c0b0ff;
+        }
+        .phase-tab.active {
+            background: #b49aff;
+            color: white;
+            border-color: #b49aff;
+        }
+        .phase-content {
+            display: none;
+        }
+        .phase-content.active {
+            display: block;
+        }
+        .phase-sub {
+            font-size: 12px;
+            color: #9a8db3;
+            font-style: italic;
+            margin-top: 4px;
+        }
+        
+        .question {
+            background: rgba(50, 50, 80, 0.6);
+            border-radius: 20px;
+            padding: 16px;
+            margin: 16px 0;
+            border: 1px solid rgba(180, 154, 255, 0.2);
+        }
+        .q-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #d0c0ff;
+        }
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(70, 70, 100, 0.4);
+            border-radius: 12px;
+            margin: 8px 0;
+            cursor: pointer;
+        }
+        .option:hover {
+            background: rgba(100, 100, 140, 0.4);
+        }
+        .option input[type="checkbox"] {
+            accent-color: #b49aff;
+            width: 18px;
+            height: 18px;
+        }
+        
         .mood-buttons {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -140,10 +211,94 @@
             resize: vertical;
         }
         
-        .page {
-            display: none;
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
         }
-        .page.active {
+        .calendar-header button {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            font-size: 20px;
+            background: transparent;
+            border: 1px solid #b49aff;
+            color: #b49aff;
+        }
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 8px;
+            text-align: center;
+            color: #9a8db3;
+            font-size: 12px;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+        .calendar-day {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            position: relative;
+        }
+        .calendar-day:hover {
+            transform: scale(1.05);
+        }
+        .day-icon {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            font-size: 10px;
+        }
+        
+        .settings-group {
+            margin: 24px 0;
+        }
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(180, 154, 255, 0.2);
+        }
+        .settings-label {
+            color: #c0b0ff;
+        }
+        select, input[type="time"], input[type="text"], input[type="number"] {
+            background: rgba(30, 30, 60, 0.8);
+            border: 1px solid rgba(180, 154, 255, 0.3);
+            border-radius: 20px;
+            padding: 8px 16px;
+            color: white;
+            width: 100%;
+            margin: 8px 0;
+        }
+        
+        .collapsible {
+            background: rgba(180, 154, 255, 0.15);
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 16px;
+            cursor: pointer;
+        }
+        .collapsible .title {
+            font-weight: 600;
+            color: #c0b0ff;
+        }
+        .collapsible-content {
+            display: none;
+            margin-top: 12px;
+        }
+        .collapsible.open .collapsible-content {
             display: block;
         }
         
@@ -152,6 +307,13 @@
             color: #9a8db3;
             font-size: 12px;
             margin-top: 24px;
+        }
+        
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
         }
     </style>
 </head>
@@ -175,44 +337,139 @@
         <button class="secondary-btn" onclick="goToPage(5)">🌙 Сразу к настроению</button>
     </div>
 
-    <!-- СТРАНИЦА 2: Приглашение партнёра (упрощённая) -->
+    <!-- СТРАНИЦА 2: Приглашение партнёра -->
     <div id="page2" class="page">
         <button class="back-btn" onclick="goToPage(1)">← Назад</button>
         <h2>📲 Пригласить партнёра</h2>
         <div style="margin: 20px 0;">
             <button onclick="window.open('https://t.me/BridgeToHer_bot', '_blank')">📱 Открыть бота</button>
-            <button class="secondary-btn" onclick="alert('Проверка подключения (тест)')">🔍 Проверить подключение</button>
+            <button class="secondary-btn" onclick="alert('Проверка подключения (демо)')">🔍 Проверить подключение</button>
         </div>
         <div class="nav-buttons">
             <button class="secondary-btn" onclick="goToPage(3)">⏰ Позже</button>
             <button class="forward-btn" onclick="goToPage(3)">Вперёд →</button>
         </div>
-        <button class="secondary-btn" onclick="goToPage(3)" style="border-color: #ff69b4; color: #ff69b4;">🌸 Нет парня</button>
+        <button class="secondary-btn" onclick="setNoPartner()" style="border-color: #ff69b4; color: #ff69b4;">🌸 Нет парня</button>
     </div>
 
-    <!-- СТРАНИЦА 3: Чек-лист (упрощённый) -->
+    <!-- СТРАНИЦА 3: Чек-лист (все 5 фаз) -->
     <div id="page3" class="page">
         <button class="back-btn" onclick="goToPage(2)">← Назад</button>
         <h2>📋 Расскажи о себе</h2>
         <p style="color: #9a8db3; margin-bottom: 16px;">Выбери фазу и отметь, что испытываешь чаще всего</p>
-        <div class="phase-tabs" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
-            <span style="padding: 8px 16px; background: #b49aff; border-radius: 40px;">🌧 ПМС</span>
+        <div class="phase-tabs">
+            <div class="phase-tab active" data-phase="pms">🌧 ПМС</div>
+            <div class="phase-tab" data-phase="mens">🌊 Менструация</div>
+            <div class="phase-tab" data-phase="ovul">🌸 Овуляция</div>
+            <div class="phase-tab" data-phase="luteal">🌙 Лютеиновая</div>
+            <div class="phase-tab" data-phase="follic">🌱 Фолликулярная</div>
         </div>
-        <div class="question" style="background: rgba(50,50,80,0.6); border-radius: 20px; padding: 16px; margin: 16px 0;">
-            <div class="q-title" style="margin-bottom: 12px;">Что ты чаще всего испытываешь?</div>
-            <div class="option"><input type="checkbox"> 😠 раздражительность</div>
-            <div class="option"><input type="checkbox"> 😭 плаксивость</div>
-            <div class="option"><input type="checkbox"> 🍰 тяга к сладкому</div>
+        <div class="phase-sub" id="phaseSub">(за 3–7 дней до менструации)</div>
+        
+        <div id="phase-pms" class="phase-content active">
+            <div class="question">
+                <div class="q-title">Что ты чаще всего испытываешь?</div>
+                <div class="option"><input type="checkbox" class="pms"> 😠 раздражительность</div>
+                <div class="option"><input type="checkbox" class="pms"> 😭 плаксивость</div>
+                <div class="option"><input type="checkbox" class="pms"> 🍰 тяга к сладкому</div>
+                <div class="option"><input type="checkbox" class="pms"> 💔 тяжесть в груди</div>
+                <div class="option"><input type="checkbox" class="pms"> 😫 усталость без сил</div>
+                <div class="option"><input type="checkbox" class="pms"> 🤯 всё бесит</div>
+                <div class="option"><input type="checkbox" class="pms"> 🛌 хочется спать днём</div>
+                <div class="option"><input type="checkbox" class="pms"> 🤗 хочется обнимашек</div>
+            </div>
         </div>
-        <button onclick="goToPage(4)">💾 Сохранить и продолжить</button>
+        
+        <div id="phase-mens" class="phase-content">
+            <div class="question">
+                <div class="q-title">Что ты чаще всего испытываешь?</div>
+                <div class="option"><input type="checkbox" class="mens"> 🔥 сильная боль</div>
+                <div class="option"><input type="checkbox" class="mens"> 😣 терпимо</div>
+                <div class="option"><input type="checkbox" class="mens"> 🛏 хочется лежать</div>
+                <div class="option"><input type="checkbox" class="mens"> 🌡 помогает грелка</div>
+                <div class="option"><input type="checkbox" class="mens"> 🤢 тошнота</div>
+                <div class="option"><input type="checkbox" class="mens"> 😭 плаксивость</div>
+                <div class="option"><input type="checkbox" class="mens"> 🍫 хочется шоколада</div>
+                <div class="option"><input type="checkbox" class="mens"> 🫂 нужна поддержка</div>
+            </div>
+        </div>
+        
+        <div id="phase-ovul" class="phase-content">
+            <div class="question">
+                <div class="q-title">Что ты чаще всего испытываешь?</div>
+                <div class="option"><input type="checkbox" class="ovul"> 🔥 прилив энергии</div>
+                <div class="option"><input type="checkbox" class="ovul"> 💃 романтический настрой</div>
+                <div class="option"><input type="checkbox" class="ovul"> 🌸 чувствую себя красивой</div>
+                <div class="option"><input type="checkbox" class="ovul"> 💋 повышено либидо</div>
+                <div class="option"><input type="checkbox" class="ovul"> ✨ хочется перемен</div>
+                <div class="option"><input type="checkbox" class="ovul"> 💬 хочется общения</div>
+                <div class="option"><input type="checkbox" class="ovul"> 🎨 тянет творить</div>
+                <div class="option"><input type="checkbox" class="ovul"> 🥰 особенно нежная</div>
+            </div>
+        </div>
+        
+        <div id="phase-luteal" class="phase-content">
+            <div class="question">
+                <div class="q-title">Что ты чаще всего испытываешь?</div>
+                <div class="option"><input type="checkbox" class="luteal"> 😌 спокойствие</div>
+                <div class="option"><input type="checkbox" class="luteal"> 😴 усталость</div>
+                <div class="option"><input type="checkbox" class="luteal"> 🤗 хочется заботы</div>
+                <div class="option"><input type="checkbox" class="luteal"> 🍚 аппетит повышается</div>
+                <div class="option"><input type="checkbox" class="luteal"> 💧 чувствительная грудь</div>
+                <div class="option"><input type="checkbox" class="luteal"> 🤫 хочется побыть одной</div>
+                <div class="option"><input type="checkbox" class="luteal"> 😐 всё равно</div>
+                <div class="option"><input type="checkbox" class="luteal"> 📚 хочется читать</div>
+            </div>
+        </div>
+        
+        <div id="phase-follic" class="phase-content">
+            <div class="question">
+                <div class="q-title">Что ты чаще всего испытываешь?</div>
+                <div class="option"><input type="checkbox" class="follic"> ⚡ много энергии</div>
+                <div class="option"><input type="checkbox" class="follic"> 😊 приподнятое настроение</div>
+                <div class="option"><input type="checkbox" class="follic"> 🎨 хочется творить</div>
+                <div class="option"><input type="checkbox" class="follic"> 💪 силы вернулись</div>
+                <div class="option"><input type="checkbox" class="follic"> 👗 хочется выглядеть красиво</div>
+                <div class="option"><input type="checkbox" class="follic"> 🤝 легко на контакт</div>
+                <div class="option"><input type="checkbox" class="follic"> 🌿 спокойствие и радость</div>
+                <div class="option"><input type="checkbox" class="follic"> 🏃 тянет к движению</div>
+            </div>
+        </div>
+        
+        <button onclick="saveChecklist()">💾 Сохранить и продолжить</button>
     </div>
 
-    <!-- СТРАНИЦА 4: Календарь (упрощённый) -->
+    <!-- СТРАНИЦА 4: Календарь -->
     <div id="page4" class="page">
         <button class="back-btn" onclick="goToPage(3)">← Назад</button>
         <h2>📅 Календарь цикла</h2>
-        <div style="margin: 20px 0; text-align: center;">
-            <div style="display: inline-block; padding: 10px;">📅 Март 2026</div>
+        <div class="collapsible" onclick="toggleCollapsible(this)">
+            <div class="title">⚙️ Мои настройки цикла ▼</div>
+            <div class="collapsible-content">
+                <div style="margin-bottom: 12px;">
+                    <div style="color: #c0b0ff;">Длина цикла (дней):</div>
+                    <input type="number" id="cycleLength" min="20" max="40" value="28" style="width:100%">
+                </div>
+                <div style="margin-bottom: 8px;">
+                    <div style="color: #c0b0ff;">Длительность менструации (дней):</div>
+                    <input type="number" id="periodLength" min="3" max="10" value="5" style="width:100%">
+                </div>
+                <button onclick="updateCycleSettings()" style="margin-top:8px;">Сохранить</button>
+            </div>
+        </div>
+        <div class="calendar-header">
+            <button onclick="changeMonth(-1)">←</button>
+            <span style="font-size:18px; color:#c0b0ff;" id="monthYearDisplay"></span>
+            <button onclick="changeMonth(1)">→</button>
+        </div>
+        <div class="calendar-weekdays">
+            <div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+        <div style="display: flex; gap: 16px; justify-content: center; margin-top: 16px;">
+            <span style="color:#9a8db3;">🔴 менструация</span>
+            <span style="color:#9a8db3;">🌸 прогноз</span>
+            <span style="color:#9a8db3;">💗 овуляция</span>
         </div>
         <div class="nav-buttons">
             <button class="secondary-btn" onclick="goToPage(3)">← Назад</button>
@@ -226,7 +483,7 @@
         <h2>🌸 Как ты сегодня?</h2>
         
         <div style="background: rgba(180, 154, 255, 0.15); border-radius: 20px; padding: 12px; margin-bottom: 16px; text-align: center;">
-            <span style="color: #c0b0ff;">🔔 Настрой частоту уведомлений, чтобы я их отправлял твоему партнёру или напрямую тебе</span>
+            <span style="color: #c0b0ff;">🔔 Настрой частоту уведомлений в разделе "Настройки"</span>
         </div>
         
         <div class="mood-buttons">
@@ -247,17 +504,47 @@
         </div>
     </div>
 
-    <!-- СТРАНИЦА 6: Настройки (упрощённые) -->
+    <!-- СТРАНИЦА 6: Настройки -->
     <div id="page6" class="page">
         <button class="back-btn" onclick="goToPage(5)">← Назад</button>
         <h2>⚙️ Настройки</h2>
-        <div class="settings-group" style="margin: 24px 0;">
+        
+        <div class="settings-group">
             <h3>🔔 Уведомления для меня</h3>
-            <div style="margin: 12px 0;">
-                <span>Напоминания: Каждый день</span>
+            <div class="settings-item">
+                <span class="settings-label">Напоминания</span>
+                <select id="reminderFreq">
+                    <option>Каждый день</option>
+                    <option selected>Только важные фазы</option>
+                    <option>Не беспокоить</option>
+                </select>
+            </div>
+            <div class="settings-item">
+                <span class="settings-label">Время</span>
+                <input type="time" id="reminderTime" value="20:00">
             </div>
         </div>
-        <button onclick="alert('Настройки сохранены (тест)')">💾 Сохранить настройки</button>
+        
+        <div class="settings-group">
+            <h3>💬 Для партнёра</h3>
+            <div class="settings-item">
+                <span class="settings-label">Частота</span>
+                <select id="partnerFreq">
+                    <option>Раз в день</option>
+                    <option selected>Только важные фазы</option>
+                    <option>По выходным</option>
+                </select>
+            </div>
+            <div class="settings-item">
+                <span class="settings-label">Имя партнёра</span>
+                <input type="text" id="partnerName" placeholder="Алексей">
+            </div>
+        </div>
+        
+        <button id="editChecklistBtn" class="secondary-btn" style="display:none;" onclick="editChecklist()">
+            📋 Редактировать мои ответы
+        </button>
+        <button onclick="saveSettings()">💾 Сохранить настройки</button>
         <div class="nav-buttons">
             <button class="secondary-btn" onclick="goToPage(5)">← Назад</button>
         </div>
@@ -267,12 +554,171 @@
 </div>
 
 <script>
+    // ==================== НАСТРОЙКИ ====================
+    let checklistCompleted = localStorage.getItem('checklistCompleted') === 'true';
+    
     function goToPage(pageNum) {
         document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
         document.getElementById('page'+pageNum).classList.add('active');
+        if (pageNum === 6) {
+            document.getElementById('editChecklistBtn').style.display = checklistCompleted ? 'block' : 'none';
+        }
+        if (pageNum === 4) renderCalendar();
     }
-
-    // Кнопки настроения
+    
+    function setNoPartner() {
+        localStorage.setItem('hasPartner', 'false');
+        goToPage(3);
+    }
+    
+    function saveChecklist() {
+        checklistCompleted = true;
+        localStorage.setItem('checklistCompleted', 'true');
+        goToPage(4);
+    }
+    
+    function editChecklist() {
+        goToPage(3);
+    }
+    
+    function saveSettings() {
+        localStorage.setItem('partnerName', document.getElementById('partnerName').value);
+        alert('Настройки сохранены');
+    }
+    
+    // ==================== КАЛЕНДАРЬ ====================
+    let currentDate = new Date();
+    let currentMonth = currentDate.getMonth();
+    let currentYear = currentDate.getFullYear();
+    
+    let cycleData = JSON.parse(localStorage.getItem('cycleData')) || { 
+        periods: [],
+        ovulations: [],
+        cycleLength: 28,
+        periodLength: 5
+    };
+    
+    function renderCalendar() {
+        const monthNames = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
+        document.getElementById('monthYearDisplay').innerText = monthNames[currentMonth] + ' ' + currentYear;
+        
+        const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+        let startOffset = firstDay === 0 ? 6 : firstDay - 1;
+        let html = '';
+        
+        for (let i = 0; i < startOffset; i++) {
+            html += `<div class="calendar-day" style="background:transparent;"></div>`;
+        }
+        
+        const cycleLength = cycleData.cycleLength || 28;
+        const periodLength = cycleData.periodLength || 5;
+        
+        for (let d = 1; d <= daysInMonth; d++) {
+            const dateStr = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+            const isPeriod = cycleData.periods.includes(dateStr);
+            const isOvulation = cycleData.ovulations.includes(dateStr);
+            
+            let isPredictedPeriod = false;
+            if (cycleData.periods.length > 0) {
+                const lastPeriodFirstDay = cycleData.periods[cycleData.periods.length - 1];
+                const lastDate = new Date(lastPeriodFirstDay);
+                for (let cycle = 1; cycle <= 12; cycle++) {
+                    const predictedStart = new Date(lastDate);
+                    predictedStart.setDate(lastDate.getDate() + (cycleLength * cycle));
+                    for (let day = 0; day < periodLength; day++) {
+                        const predDate = new Date(predictedStart);
+                        predDate.setDate(predictedStart.getDate() + day);
+                        const predStr = predDate.toISOString().split('T')[0];
+                        if (dateStr === predStr) isPredictedPeriod = true;
+                    }
+                }
+            }
+            
+            let bg = 'rgba(180, 154, 255, 0.1)';
+            let icon = '';
+            if (isPeriod) { bg = '#FF2400'; icon = '🔴'; }
+            else if (isOvulation) { bg = '#E6E6FA'; icon = '💗'; }
+            else if (isPredictedPeriod) { bg = '#FFB6C1'; icon = '🌸'; }
+            
+            const today = new Date().toISOString().split('T')[0];
+            if (dateStr === today) { bg = '#FFFFE0'; icon = '✨'; }
+            
+            html += `<div class="calendar-day" style="background:${bg};" onclick="openDayMenu('${dateStr}')">
+                        <span>${d}</span>${icon ? `<span class="day-icon">${icon}</span>` : ''}
+                     </div>`;
+        }
+        document.getElementById('calendarGrid').innerHTML = html;
+    }
+    
+    function openDayMenu(dateStr) {
+        const action = confirm('📅 Отметить как первый день менструации?');
+        if (action === true) {
+            cycleData.periods.push(dateStr);
+            cycleData.periods.sort();
+            const periodLength = cycleData.periodLength || 5;
+            const selectedDate = new Date(dateStr);
+            for (let i = 1; i < periodLength; i++) {
+                const nextDay = new Date(selectedDate);
+                nextDay.setDate(selectedDate.getDate() + i);
+                const nextDayStr = nextDay.toISOString().split('T')[0];
+                if (!cycleData.periods.includes(nextDayStr)) cycleData.periods.push(nextDayStr);
+            }
+            cycleData.periods.sort();
+            localStorage.setItem('cycleData', JSON.stringify(cycleData));
+            renderCalendar();
+            alert(`✅ Отмечена менструация с ${dateStr} (${periodLength} дн.)`);
+        } else {
+            const ovulAction = confirm('🌸 Отметить как день овуляции?');
+            if (ovulAction) {
+                cycleData.ovulations.push(dateStr);
+                cycleData.ovulations.sort();
+                localStorage.setItem('cycleData', JSON.stringify(cycleData));
+                renderCalendar();
+                alert(`✅ Отмечена овуляция ${dateStr}`);
+            }
+        }
+    }
+    
+    function changeMonth(delta) {
+        currentMonth += delta;
+        if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+        else if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+        renderCalendar();
+    }
+    
+    function updateCycleSettings() {
+        cycleData.cycleLength = parseInt(document.getElementById('cycleLength').value) || 28;
+        cycleData.periodLength = parseInt(document.getElementById('periodLength').value) || 5;
+        localStorage.setItem('cycleData', JSON.stringify(cycleData));
+        renderCalendar();
+        alert('Настройки цикла сохранены');
+    }
+    
+    function toggleCollapsible(el) {
+        el.classList.toggle('open');
+    }
+    
+    // ==================== ФАЗЫ ====================
+    document.querySelectorAll('.phase-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.phase-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.phase-content').forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+            const phase = this.dataset.phase;
+            document.getElementById('phase-'+phase).classList.add('active');
+            const sub = {
+                pms: '(за 3–7 дней до менструации)',
+                mens: '(дни кровотечения)',
+                ovul: '(пик фертильности)',
+                luteal: '(после овуляции до начала менструации)',
+                follic: '(от 1-го дня менструации до овуляции)'
+            }[phase];
+            document.getElementById('phaseSub').innerText = sub;
+        });
+    });
+    
+    // ==================== НАСТРОЕНИЕ ====================
     document.querySelectorAll('.mood-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
@@ -280,7 +726,6 @@
         });
     });
     
-    // Отправка
     document.getElementById('sendDailyBtn').addEventListener('click', function() {
         const activeMood = document.querySelector('.mood-btn.active');
         if (!activeMood) {
@@ -291,6 +736,13 @@
         const note = document.getElementById('dailyNote').value;
         alert(`Отправлено: ${moodText}\n${note ? 'Заметка: ' + note : ''}`);
     });
+    
+    // ==================== ИНИЦИАЛИЗАЦИЯ ====================
+    const savedHasPartner = localStorage.getItem('hasPartner');
+    if (savedHasPartner === 'false') {
+        // Если выбрала "нет парня", остаёмся на странице 3
+    }
+    goToPage(1);
 </script>
 </body>
 </html>
