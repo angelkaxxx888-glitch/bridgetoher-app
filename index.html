@@ -1,16 +1,480 @@
-Отлично! Начинаю делать 🚀Готово! 🎉 Вот что теперь есть в твоём приложении:
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>BridgeToHer · мост к нему</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --rose: #e8a0b0;
+  --rose-deep: #c4687e;
+  --plum: #2d1b2e;
+  --plum-mid: #3d2540;
+  --plum-light: #5a3560;
+  --lavender: #c9b8e8;
+  --lavender-pale: #ede8f7;
+  --cream: #f5efe8;
+  --gold: #d4a76a;
+  --text: #f0e8f0;
+  --text-muted: #b8a8c0;
+  --glass: rgba(255,255,255,0.06);
+  --glass-border: rgba(255,255,255,0.12);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow:hidden; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--plum);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 20%, rgba(200,100,140,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 80% 80%, rgba(100,60,140,0.22) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 60% 30%, rgba(212,167,106,0.08) 0%, transparent 50%);
+  pointer-events:none; z-index:0;
+}
+.shell {
+  position:relative; z-index:1;
+  width:100%; max-width:420px;
+  height:100vh; max-height:860px;
+  display:flex; flex-direction:column;
+  overflow:hidden;
+}
+.page { display:none; flex-direction:column; height:100%; padding:32px 24px 28px; animation: fadeUp 0.4s ease; }
+.page.active { display:flex; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+.brand { text-align:center; margin-bottom:auto; padding-top:24px; }
+.brand-logo { font-family:'Cormorant Garamond', serif; font-size:52px; font-weight:300; letter-spacing:6px; color: var(--rose); line-height:1; }
+.brand-sub { font-size:11px; letter-spacing:4px; text-transform:uppercase; color: var(--text-muted); margin-top:6px; }
+.page-title { font-family:'Cormorant Garamond', serif; font-size:28px; font-weight:400; font-style:italic; color: var(--lavender); margin-bottom:6px; line-height:1.2; }
+.page-desc { font-size:13px; color: var(--text-muted); line-height:1.7; margin-bottom:24px; }
+.btn { width:100%; padding:15px 20px; border-radius:100px; font-size:14px; font-weight:500; cursor:pointer; border:none; transition: all 0.25s; letter-spacing:0.3px; }
+.btn-primary { background: linear-gradient(135deg, var(--rose-deep), #a04060); color: white; box-shadow: 0 8px 24px rgba(196,104,126,0.3); }
+.btn-primary:hover { transform:translateY(-1px); box-shadow: 0 12px 28px rgba(196,104,126,0.4); }
+.btn-ghost { background: var(--glass); border: 1px solid var(--glass-border); color: var(--text-muted); }
+.btn-ghost:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+.btn-lavender { background: linear-gradient(135deg, #6b4a90, #9068b8); color: white; box-shadow: 0 8px 24px rgba(107,74,144,0.3); }
+.btn + .btn { margin-top:10px; }
+.btn-row { display:flex; gap:10px; margin-top:10px; }
+.btn-row .btn { flex:1; }
+.back-link { background:none; border:none; cursor:pointer; color: var(--text-muted); font-size:13px; display:inline-flex; align-items:center; gap:6px; margin-bottom:20px; font-family:'DM Sans', sans-serif; transition: color 0.2s; }
+.back-link:hover { color: var(--text); }
+.card { background: var(--glass); border: 1px solid var(--glass-border); border-radius:20px; padding:16px 20px; margin-bottom:12px; }
+.check-item { display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer; transition: all 0.2s; }
+.check-item:last-child { border-bottom:none; }
+.check-box { width:22px; height:22px; border-radius:50%; border:1.5px solid var(--text-muted); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition: all 0.2s; }
+.check-item.checked .check-box { background: var(--rose-deep); border-color: var(--rose-deep); }
+.check-item.checked .check-box::after { content:'✓'; font-size:12px; color:white; }
+.check-label { font-size:14px; color: var(--text); line-height:1.4; }
+.mood-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
+.mood-btn { padding:14px 8px; border-radius:16px; border:1.5px solid var(--glass-border); background: var(--glass); cursor:pointer; transition:all 0.2s; text-align:center; }
+.mood-btn .emoji { font-size:26px; display:block; margin-bottom:4px; }
+.mood-btn .label { font-size:11px; color: var(--text-muted); }
+.mood-btn.selected { border-color: var(--rose-deep); background: rgba(196,104,126,0.15); }
+.mood-btn.selected .label { color: var(--rose); }
+.cal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.cal-nav { background:none; border:none; cursor:pointer; color: var(--lavender); font-size:20px; padding:6px; }
+.cal-month { font-family:'Cormorant Garamond',serif; font-size:20px; color: var(--text); }
+.cal-weekdays { display:grid; grid-template-columns:repeat(7,1fr); text-align:center; margin-bottom:8px; }
+.cal-weekdays span { font-size:11px; color: var(--text-muted); padding:4px 0; }
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
+.cal-day { aspect-ratio:1; display:flex; align-items:center; justify-content:center; border-radius:10px; font-size:13px; cursor:pointer; background: rgba(255,255,255,0.04); transition:all 0.2s; }
+.cal-day:hover { background: rgba(255,255,255,0.1); }
+.cal-day.empty { background:none; cursor:default; }
+.cal-day.period { background: rgba(232,85,110,0.35); color: #ff8fa0; font-weight:600; }
+.cal-day.today { border:1.5px solid var(--lavender); }
+.cal-legend { display:flex; gap:16px; margin-top:12px; }
+.cal-legend-item { display:flex; align-items:center; gap:6px; font-size:11px; color: var(--text-muted); }
+.cal-dot { width:10px; height:10px; border-radius:50%; }
+.ai-box { background: linear-gradient(135deg, rgba(107,74,144,0.3), rgba(196,104,126,0.2)); border: 1px solid rgba(201,184,232,0.25); border-radius:20px; padding:20px; margin-bottom:16px; }
+.ai-label { font-size:10px; letter-spacing:3px; text-transform:uppercase; color: var(--lavender); margin-bottom:10px; }
+.ai-text { font-family:'Cormorant Garamond',serif; font-size:17px; font-style:italic; line-height:1.6; color: var(--text); }
+.dot-pulse span { width:7px; height:7px; border-radius:50%; background: var(--rose); display:inline-block; animation: pulse 1.2s infinite; }
+.dot-pulse span:nth-child(2) { animation-delay:0.2s; }
+.dot-pulse span:nth-child(3) { animation-delay:0.4s; }
+@keyframes pulse { 0%,80%,100%{opacity:0.3;transform:scale(0.8)} 40%{opacity:1;transform:scale(1)} }
+.phase-badge { display:inline-flex; align-items:center; gap:8px; padding:8px 16px; border-radius:100px; font-size:12px; margin-bottom:16px; }
+.phase-menstrual { background:rgba(232,85,110,0.2); border:1px solid rgba(232,85,110,0.4); color:#ff8fa0; }
+.phase-follicular { background:rgba(212,167,106,0.2); border:1px solid rgba(212,167,106,0.4); color:var(--gold); }
+.phase-ovulation { background:rgba(100,180,120,0.2); border:1px solid rgba(100,180,120,0.4); color:#80e0a0; }
+.phase-luteal { background:rgba(107,74,144,0.3); border:1px solid rgba(201,184,232,0.4); color:var(--lavender); }
+.setting-row { display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.06); }
+.setting-label { font-size:14px; }
+.setting-sub { font-size:11px; color: var(--text-muted); margin-top:2px; }
+.toggle { width:44px; height:24px; border-radius:100px; background:rgba(255,255,255,0.1); position:relative; cursor:pointer; border:none; transition:all 0.3s; flex-shrink:0; }
+.toggle.on { background:var(--rose-deep); }
+.toggle::after { content:''; position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:white; transition:all 0.3s; }
+.toggle.on::after { left:23px; }
+.select-pill { display:flex; gap:6px; }
+.select-pill button { padding:6px 14px; border-radius:100px; font-size:12px; border:1.5px solid rgba(255,255,255,0.15); background:none; color:var(--text-muted); cursor:pointer; transition:all 0.2s; }
+.select-pill button.active { border-color:var(--rose-deep); background:rgba(196,104,126,0.15); color:var(--rose); }
+input[type=text], input[type=tel] { width:100%; padding:12px 16px; border-radius:12px; background: rgba(255,255,255,0.06); border:1.5px solid rgba(255,255,255,0.1); color: var(--text); font-family:'DM Sans',sans-serif; font-size:14px; outline:none; transition:all 0.2s; margin-top:6px; }
+input:focus { border-color: var(--rose-deep); background: rgba(196,104,126,0.08); }
+input::placeholder { color: var(--text-muted); }
+.welcome-art { text-align:center; padding:20px 0; font-size:72px; line-height:1; filter: drop-shadow(0 0 20px rgba(232,160,176,0.4)); }
+.welcome-text { text-align:center; font-size:15px; color:var(--text-muted); line-height:1.8; margin-bottom:32px; }
+.welcome-text strong { color: var(--rose); font-weight:500; }
+.scroll-area { flex:1; overflow-y:auto; padding-right:4px; }
+.scroll-area::-webkit-scrollbar { width:3px; }
+.scroll-area::-webkit-scrollbar-track { background:transparent; }
+.scroll-area::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.15); border-radius:10px; }
+.footer { text-align:center; font-size:10px; color:rgba(255,255,255,0.2); letter-spacing:2px; text-transform:uppercase; margin-top:16px; }
+.notif-preview { background: rgba(30,20,35,0.9); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:14px 16px; margin-top:12px; font-size:13px; }
+.notif-header { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.notif-app { font-size:11px; color:var(--text-muted); }
+.notif-body { line-height:1.5; color:var(--text); }
+.step-dots { display:flex; gap:6px; justify-content:center; margin-bottom:24px; }
+.step-dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,0.15); transition:all 0.3s; }
+.step-dot.active { width:20px; background:var(--rose); }
+</style>
+</head>
+<body>
+<div class="shell">
 
-**Страница 1 — Приветствие** — красивый экран с двумя путями
+<div id="p1" class="page active">
+  <div class="brand" style="padding-top:40px; margin-bottom:32px;">
+    <div class="brand-logo">BTH</div>
+    <div class="brand-sub">BridgeToHer</div>
+  </div>
+  <div class="welcome-art">🌸</div>
+  <div class="welcome-text">Приложение-мост между<br><strong>твоим самочувствием</strong><br>и его пониманием</div>
+  <button class="btn btn-primary" onclick="go(2)">✨ Начать путь</button>
+  <button class="btn btn-ghost" onclick="go(5)" style="margin-top:10px">🌙 Сразу к настроению</button>
+  <div class="footer" style="margin-top:20px">BridgeToHer · мост к нему</div>
+</div>
 
-**Страница 2 — Партнёр** — поле для номера телефона + превью как будет выглядеть его SMS
+<div id="p2" class="page">
+  <button class="back-link" onclick="go(1)">← назад</button>
+  <div class="step-dots"><div class="step-dot active"></div><div class="step-dot"></div><div class="step-dot"></div></div>
+  <div class="page-title">Пригласить партнёра</div>
+  <div class="page-desc">Он будет получать умные подсказки о твоём состоянии — без лишних слов с твоей стороны.</div>
+  <div class="card">
+    <div style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">📱 Номер партнёра</div>
+    <input type="tel" id="partnerPhone" placeholder="+7 999 123 45 67">
+    <div style="font-size:11px; color:var(--text-muted); margin-top:8px;">Он получит SMS с приглашением. Приложение устанавливать не нужно.</div>
+  </div>
+  <div class="notif-preview">
+    <div class="notif-header"><span>💌</span><span class="notif-app">BridgeToHer</span></div>
+    <div class="notif-body">«Привет. Сегодня у неё лютеальная фаза — немного повышена чувствительность. Хорошая идея: просто обнять и не задавать лишних вопросов 🤍»</div>
+  </div>
+  <div style="margin-top:auto; padding-top:20px;">
+    <button class="btn btn-primary" onclick="savePhone(); go(3)">Сохранить и продолжить →</button>
+    <button class="btn btn-ghost" onclick="go(3)" style="margin-top:10px">⏭ Пропустить пока</button>
+  </div>
+</div>
 
-**Страница 3 — О себе** — полный чек-лист:
-- Что хочу в ПМС (обнять, шоколад, тишина...)
-- Чего НЕ делать в тяжёлые дни
-- Длина цикла (24–32 дня)
+<div id="p3" class="page">
+  <button class="back-link" onclick="go(2)">← назад</button>
+  <div class="step-dots"><div class="step-dot"></div><div class="step-dot active"></div><div class="step-dot"></div></div>
+  <div class="page-title">Расскажи о себе</div>
+  <div class="page-desc">Что ты хочешь в ПМС и тяжёлые дни? Партнёр получит эти подсказки автоматически.</div>
+  <div class="scroll-area">
+    <div class="card" style="margin-bottom:16px;">
+      <div style="font-size:12px; color:var(--text-muted); margin-bottom:12px; letter-spacing:1px; text-transform:uppercase;">Чего я хочу в ПМС</div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">🤗 Просто обнять и не задавать вопросов</div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">🍫 Принести что-то вкусное (шоколад, торт)</div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">🔇 Оставить меня в покое и тишине</div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">🎬 Посмотреть вместе фильм</div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">💆 Сделать массаж</div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">🌸 Напомнить что я красивая</div></div>
+    </div>
+    <div class="card">
+      <div style="font-size:12px; color:var(--text-muted); margin-bottom:12px; letter-spacing:1px; text-transform:uppercase;">Чего НЕ делать в тяжёлые дни</div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">🚫 Не начинать серьёзных разговоров</div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">🚫 Не обижаться если я раздражена</div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">🚫 Не предлагать выйти куда-то</div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">🚫 Не критиковать и не давать советов</div></div>
+    </div>
+    <div class="card">
+      <div style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">📅 Длина цикла (дней)</div>
+      <div class="select-pill">
+        <button onclick="selectCycle(this,24)">24</button>
+        <button onclick="selectCycle(this,26)">26</button>
+        <button class="active" onclick="selectCycle(this,28)">28</button>
+        <button onclick="selectCycle(this,30)">30</button>
+        <button onclick="selectCycle(this,32)">32</button>
+      </div>
+    </div>
+  </div>
+  <button class="btn btn-primary" onclick="saveProfile(); go(4)" style="margin-top:16px;">💾 Сохранить и продолжить →</button>
+</div>
 
-**Страница 4 — Календарь** — отмечаешь дни цикла
+<div id="p4" class="page">
+  <button class="back-link" onclick="go(3)">← назад</button>
+  <div class="step-dots"><div class="step-dot"></div><div class="step-dot"></div><div class="step-dot active"></div></div>
+  <div class="page-title">Календарь цикла</div>
+  <div class="page-desc">Отметь первый день последних месячных.</div>
+  <div class="cal-header">
+    <button class="cal-nav" onclick="changeMonth(-1)">‹</button>
+    <span class="cal-month" id="calMonthLabel"></span>
+    <button class="cal-nav" onclick="changeMonth(1)">›</button>
+  </div>
+  <div class="cal-weekdays"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span></div>
+  <div class="cal-grid" id="calGrid"></div>
+  <div class="cal-legend">
+    <div class="cal-legend-item"><div class="cal-dot" style="background:#ff6880;"></div>Менструация</div>
+    <div class="cal-legend-item"><div class="cal-dot" style="border:1.5px solid var(--lavender);"></div>Сегодня</div>
+  </div>
+  <div style="margin-top:auto; padding-top:16px;">
+    <button class="btn btn-primary" onclick="go(5)">Готово → к настроению</button>
+  </div>
+</div>
 
-**Страница 5 — Настроение** — выбираешь из 9 эмодзи, и **AI от Claude автоматически генерирует сообщение для партнёра** на основе фазы цикла + твоего настроения + твоих пожеланий из чек-листа
+<div id="p5" class="page">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+    <button class="back-link" style="margin:0;" onclick="go(4)">← назад</button>
+    <button style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:13px;" onclick="go(6)">⚙️</button>
+  </div>
+  <div class="page-title">Как ты сегодня? 🌸</div>
+  <div id="phaseBadge"></div>
+  <div class="page-desc" style="margin-bottom:12px;">Выбери что ближе всего к твоему состоянию:</div>
+  <div class="mood-grid" id="moodGrid">
+    <div class="mood-btn" onclick="selectMood(this,'😊','Хорошо')"><span class="emoji">😊</span><span class="label">Хорошо</span></div>
+    <div class="mood-btn" onclick="selectMood(this,'🥰','Влюблена')"><span class="emoji">🥰</span><span class="label">Влюблена</span></div>
+    <div class="mood-btn" onclick="selectMood(this,'😴','Устала')"><span class="emoji">😴</span><span class="label">Устала</span></div>
+    <div class="mood-btn" onclick="selectMood(this,'😤','Раздражена')"><span class="emoji">😤</span><span class="label">Раздражена</span></div>
+    <div class="mood-btn" onclick="selectMood(this,'😢','Грустно')"><span class="emoji">😢</span><span class="label">Грустно</span></div>
+    <div class="mood-btn" onclick="selectMood(this,'🌊','Тревожно')"><span class="emoji">🌊</span><span class="label">Тревожно</span></div>
+    <div class="mood-btn" onclick="selectMood(this,'💪','Энергично')"><span class="emoji">💪</span><span class="label">Энергично</span></div>
+    <div class="mood-btn" onclick="selectMood(this,'🍫','Хочу вкусного')"><span class="emoji">🍫</span><span class="label">Хочу вкусного</span></div>
+    <div class="mood-btn" onclick="selectMood(this,'🤷','Смешанно')"><span class="emoji">🤷</span><span class="label">Смешанно</span></div>
+  </div>
+  <div id="aiBox" style="display:none;">
+    <div class="ai-box">
+      <div class="ai-label">💌 Сообщение для партнёра</div>
+      <div class="ai-text" id="aiText"></div>
+    </div>
+    <button class="btn btn-lavender" onclick="copyMessage()">📋 Скопировать сообщение</button>
+    <button class="btn btn-ghost" onclick="generateMessage()" style="margin-top:8px;">🔄 Другой вариант</button>
+  </div>
+</div>
 
-**Страница 6 — Настройки** — имя партнёра, частота уведомлений, анонимный режим
+<div id="p6" class="page">
+  <button class="back-link" onclick="go(5)">← назад</button>
+  <div class="page-title">Настройки</div>
+  <div class="scroll-area">
+    <div class="card">
+      <div style="font-size:12px; color:var(--text-muted); margin-bottom:12px; letter-spacing:1px; text-transform:uppercase;">Уведомления партнёру</div>
+      <div class="setting-row">
+        <div><div class="setting-label">Отправлять сообщения</div><div class="setting-sub">Партнёр получает уведомления</div></div>
+        <button class="toggle on" id="notifToggle" onclick="toggleNotif(this)"></button>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">Частота</div>
+        <div class="select-pill">
+          <button class="active" onclick="selectFreq(this,'daily')">Каждый день</button>
+          <button onclick="selectFreq(this,'3days')">Раз в 3 дня</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-size:12px; color:var(--text-muted); margin-bottom:12px; letter-spacing:1px; text-transform:uppercase;">Данные партнёра</div>
+      <div style="font-size:12px; color:var(--text-muted); margin-bottom:4px;">Имя</div>
+      <input type="text" id="partnerName" placeholder="Имя партнёра">
+      <div style="font-size:12px; color:var(--text-muted); margin-bottom:4px; margin-top:12px;">Телефон</div>
+      <input type="tel" id="partnerPhoneSet" placeholder="+7 999 123 45 67">
+    </div>
+    <div class="card">
+      <div style="font-size:12px; color:var(--text-muted); margin-bottom:12px; letter-spacing:1px; text-transform:uppercase;">Конфиденциальность</div>
+      <div class="setting-row">
+        <div><div class="setting-label">Анонимный режим</div><div class="setting-sub">Партнёр видит только советы, не детали</div></div>
+        <button class="toggle on" onclick="toggleNotif(this)"></button>
+      </div>
+    </div>
+  </div>
+  <button class="btn btn-primary" onclick="saveSettings()" style="margin-top:16px;">💾 Сохранить</button>
+</div>
+
+</div>
+<script>
+let state = JSON.parse(localStorage.getItem('bth_state') || '{}');
+state.periods = state.periods || [];
+state.cycleLen = state.cycleLen || 28;
+state.checks = state.checks || [];
+state.partnerPhone = state.partnerPhone || '';
+state.partnerName = state.partnerName || '';
+state.notifEnabled = state.notifEnabled !== undefined ? state.notifEnabled : true;
+state.freq = state.freq || 'daily';
+function saveState() { localStorage.setItem('bth_state', JSON.stringify(state)); }
+
+function go(n) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('p'+n).classList.add('active');
+  if(n===4) renderCalendar();
+  if(n===5) renderMoodPage();
+  if(n===6) loadSettings();
+}
+
+function toggleCheck(el) {
+  el.classList.toggle('checked');
+  state.checks = [...document.querySelectorAll('.check-item.checked')].map(e=>e.querySelector('.check-label').textContent.trim());
+  saveState();
+}
+
+function selectCycle(btn, val) {
+  document.querySelectorAll('.select-pill button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  state.cycleLen = val; saveState();
+}
+
+function saveProfile() { saveState(); }
+function savePhone() { state.partnerPhone = document.getElementById('partnerPhone').value; saveState(); }
+
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+const MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+
+function renderCalendar() {
+  document.getElementById('calMonthLabel').textContent = MONTHS[calMonth] + ' ' + calYear;
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const days = new Date(calYear, calMonth+1, 0).getDate();
+  const offset = firstDay === 0 ? 6 : firstDay - 1;
+  const today = new Date();
+  let html = '';
+  for(let i=0;i<offset;i++) html += `<div class="cal-day empty"></div>`;
+  for(let d=1;d<=days;d++){
+    const ds = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isPeriod = state.periods.includes(ds);
+    const isToday = today.getDate()===d && today.getMonth()===calMonth && today.getFullYear()===calYear;
+    let cls = 'cal-day';
+    if(isPeriod) cls+=' period';
+    if(isToday) cls+=' today';
+    html += `<div class="${cls}" onclick="togglePeriod('${ds}')">${d}</div>`;
+  }
+  document.getElementById('calGrid').innerHTML = html;
+}
+
+function togglePeriod(ds) {
+  const i = state.periods.indexOf(ds);
+  if(i===-1) state.periods.push(ds); else state.periods.splice(i,1);
+  saveState(); renderCalendar();
+}
+
+function changeMonth(d) {
+  calMonth += d;
+  if(calMonth<0){calMonth=11;calYear--;}
+  if(calMonth>11){calMonth=0;calYear++;}
+  renderCalendar();
+}
+
+function detectPhase() {
+  if(!state.periods.length) return null;
+  const sorted = [...state.periods].sort();
+  const last = new Date(sorted[sorted.length-1]);
+  const today = new Date();
+  const diff = Math.floor((today - last) / 86400000);
+  const cycle = state.cycleLen || 28;
+  if(diff < 0) return null;
+  if(diff <= 5) return 'menstrual';
+  if(diff <= 13) return 'follicular';
+  if(diff <= 16) return 'ovulation';
+  if(diff <= cycle) return 'luteal';
+  return 'luteal';
+}
+
+const PHASES = {
+  menstrual: { label:'🔴 Менструация', cls:'phase-menstrual', desc:'1–5 день', ai:'менструальная фаза — первые дни цикла. Уровень энергии низкий, чувствительность повышена.' },
+  follicular: { label:'🌱 Фолликулярная', cls:'phase-follicular', desc:'6–13 день', ai:'фолликулярная фаза. Настроение улучшается, энергия растёт — хорошее время для общих планов.' },
+  ovulation: { label:'✨ Овуляция', cls:'phase-ovulation', desc:'14–16 день', ai:'день овуляции! Пик энергии, отличное настроение, максимальная открытость к общению.' },
+  luteal: { label:'🌙 Лютеальная', cls:'phase-luteal', desc:'17–28 день', ai:'лютеальная фаза (предменструальный период). Возможна повышенная чувствительность и раздражительность.' },
+};
+
+function renderMoodPage() {
+  const phase = detectPhase();
+  const badge = document.getElementById('phaseBadge');
+  if(phase && PHASES[phase]) {
+    const p = PHASES[phase];
+    badge.innerHTML = `<div class="phase-badge ${p.cls}">${p.label} · ${p.desc}</div>`;
+  } else {
+    badge.innerHTML = `<div class="phase-badge phase-luteal">📅 Отметь цикл для фаз</div>`;
+  }
+  document.getElementById('aiBox').style.display = 'none';
+  document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('selected'));
+}
+
+let selectedMoodEmoji = '';
+let selectedMoodLabel = '';
+
+function selectMood(el, emoji, label) {
+  document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedMoodEmoji = emoji; selectedMoodLabel = label;
+  state.selectedMood = label; saveState();
+  document.getElementById('aiBox').style.display = 'block';
+  generateMessage();
+}
+
+async function generateMessage() {
+  const phase = detectPhase();
+  const phaseInfo = phase ? PHASES[phase] : null;
+  const checks = state.checks || [];
+  const name = state.partnerName ? `, партнёр по имени ${state.partnerName}` : '';
+  const wishes = checks.length ? `Её пожелания в такие дни: ${checks.slice(0,3).join('; ')}.` : '';
+  const prompt = `Ты — нежный и умный помощник для пар. Напиши короткое SMS-сообщение для мужчины${name} о его партнёрше.\n\nСегодня у неё: ${phaseInfo ? phaseInfo.ai : 'неизвестная фаза цикла'}.\nЕё настроение сейчас: ${selectedMoodLabel} ${selectedMoodEmoji}.\n${wishes}\n\nТребования:\n- 2-3 предложения, максимум 120 слов\n- Тёплый тон, обращение на "ты"\n- Конкретный совет что сделать или не делать сегодня\n- Без медицинских терминов\n- Заканчивай смайликом\n\nПиши только текст сообщения, без кавычек.`;
+
+  const aiTextEl = document.getElementById('aiText');
+  aiTextEl.innerHTML = `<div class="dot-pulse"><span></span><span></span><span></span></div>`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:200, messages:[{role:'user', content:prompt}] })
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text || fallbackMessage(phase, label);
+    aiTextEl.textContent = text;
+    state.lastMessage = text; saveState();
+  } catch(e) {
+    aiTextEl.textContent = fallbackMessage(phase, selectedMoodLabel);
+  }
+}
+
+function fallbackMessage(phase, mood) {
+  const msgs = {
+    menstrual: 'Сегодня у неё первые дни цикла — уровень энергии низкий. Будь нежным, не предлагай выходить куда-то. Просто обними 💜',
+    ovulation: 'Сегодня у неё отличный день — пик энергии! Возьми цветы, предложи что-то романтическое. Она это оценит 🌹',
+    luteal: 'Она сейчас в предменструальном периоде — возможны перепады настроения. Будь терпелив и напомни ей что она любима 💜',
+    follicular: 'Её настроение улучшается и энергия растёт! Хороший день чтобы что-то запланировать вместе 🌱',
+  };
+  return msgs[phase] || msgs.luteal;
+}
+
+function copyMessage() {
+  const text = document.getElementById('aiText').textContent;
+  if(navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(()=> alert('Скопировано! Отправь партнёру 💌'));
+  } else { alert(text); }
+}
+
+function loadSettings() {
+  if(state.partnerName) document.getElementById('partnerName').value = state.partnerName;
+  if(state.partnerPhone) document.getElementById('partnerPhoneSet').value = state.partnerPhone;
+  if(!state.notifEnabled) document.getElementById('notifToggle').classList.remove('on');
+}
+
+function toggleNotif(btn) { btn.classList.toggle('on'); }
+
+function selectFreq(btn, val) {
+  btn.closest('.select-pill').querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); state.freq = val;
+}
+
+function saveSettings() {
+  state.partnerName = document.getElementById('partnerName').value;
+  state.partnerPhone = document.getElementById('partnerPhoneSet').value;
+  state.notifEnabled = document.getElementById('notifToggle').classList.contains('on');
+  saveState(); alert('Сохранено ✓'); go(5);
+}
+
+go(1);
+</script>
+</body>
+</html>
